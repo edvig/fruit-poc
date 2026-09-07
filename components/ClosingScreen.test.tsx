@@ -4,7 +4,7 @@ import { afterEach, describe, expect, it } from "vitest";
 
 import ClosingScreen from "@/components/ClosingScreen";
 import { getConfig } from "@/lib/config";
-import { STORAGE_KEY, serialiseSession } from "@/lib/session";
+import { STORAGE_KEY, serialiseSession, today } from "@/lib/session";
 import { resetStoreForTests } from "@/lib/session-store";
 
 const config = getConfig();
@@ -17,8 +17,17 @@ afterEach(() => {
 
 /** Weighs 2 kg of apples with no container, the shortest real entry there is. */
 async function weighApples(user: ReturnType<typeof userEvent.setup>) {
-  await user.click(screen.getByRole("button", { name: /^Alma/ }));
-  await user.type(screen.getByLabelText(/Raw weight/), "2");
+  await weigh(user, "Alma", "2");
+}
+
+/** Opens a weighed product's row, types a raw weight, and commits it. */
+async function weigh(
+  user: ReturnType<typeof userEvent.setup>,
+  name: string,
+  raw: string,
+) {
+  await user.click(screen.getByRole("button", { name: new RegExp(`^${name}`) }));
+  await user.type(screen.getByLabelText(/Raw weight/), raw);
   await user.click(screen.getByRole("button", { name: "Add to closing" }));
 }
 
@@ -121,5 +130,165 @@ describe("starting a new closing on purpose", () => {
         .getByRole("button", { name: "Start new closing" })
         .hasAttribute("disabled"),
     ).toBe(true);
+  });
+});
+
+describe("switching closing type", () => {
+  // Step 4's whole point: the right list for the right closing. Daily is a
+  // subset of weekly, and monthly adds the categories the other two never
+  // touch.
+  it("shows each tier's own product list", async () => {
+    const user = userEvent.setup();
+    render(<ClosingScreen config={config} />);
+    expect(screen.getByText("0/38 entered")).toBeDefined();
+
+    await user.click(screen.getByRole("tab", { name: "Weekly" }));
+    expect(screen.getByText("0/58 entered")).toBeDefined();
+
+    await user.click(screen.getByRole("tab", { name: "Monthly" }));
+    expect(screen.getByText("0/132 entered")).toBeDefined();
+  });
+
+  it("hides weekly-only products from the daily closing", async () => {
+    const user = userEvent.setup();
+    render(<ClosingScreen config={config} />);
+    expect(screen.queryByRole("button", { name: /^Cékla/ })).toBeNull();
+
+    await user.click(screen.getByRole("tab", { name: "Weekly" }));
+    expect(screen.getByRole("button", { name: /^Cékla/ })).toBeDefined();
+  });
+
+  it("brings out the monthly-only groups only in the monthly closing", async () => {
+    const user = userEvent.setup();
+    render(<ClosingScreen config={config} />);
+    expect(screen.queryByRole("button", { name: /Display case/ })).toBeNull();
+
+    await user.click(screen.getByRole("tab", { name: "Monthly" }));
+    expect(screen.getByRole("button", { name: /Display case/ })).toBeDefined();
+    expect(screen.getByRole("button", { name: /Coffee & sugar/ })).toBeDefined();
+  });
+
+  it("keeps entries made in another tier rather than discarding them", async () => {
+    const user = userEvent.setup();
+    render(<ClosingScreen config={config} />);
+
+    await user.click(screen.getByRole("tab", { name: "Weekly" }));
+    await weigh(user, "Cékla", "2");
+    expect(screen.getByText("1/58 entered")).toBeDefined();
+
+    // Cékla is not weighed daily, so it drops out of sight - but the entry is
+    // still there when the weekly closing comes back.
+    await user.click(screen.getByRole("tab", { name: "Daily" }));
+    expect(screen.getByText("0/38 entered")).toBeDefined();
+    expect(screen.queryByRole("button", { name: /^Cékla/ })).toBeNull();
+
+    await user.click(screen.getByRole("tab", { name: "Weekly" }));
+    expect(screen.getByText("1/58 entered")).toBeDefined();
+    expect(screen.getByText("2 kg")).toBeDefined();
+  });
+});
+
+describe("the Missing filter", () => {
+  it("hides what is already entered, so the list shrinks as work gets done", async () => {
+    const user = userEvent.setup();
+    render(<ClosingScreen config={config} />);
+    await weighApples(user);
+
+    await user.click(screen.getByRole("button", { name: /^Missing/ }));
+    expect(screen.queryByRole("button", { name: /^Alma/ })).toBeNull();
+    expect(screen.getByRole("button", { name: /^Narancs/ })).toBeDefined();
+
+    await user.click(screen.getByRole("button", { name: /^All/ }));
+    expect(screen.getByRole("button", { name: /^Alma/ })).toBeDefined();
+  });
+
+  it("counts what is left to do", async () => {
+    const user = userEvent.setup();
+    render(<ClosingScreen config={config} />);
+    // The count sits in its own span, so it reads as "Missing38", no space.
+    const missing = () => screen.getByRole("button", { name: /^Missing/ });
+    expect(missing().textContent).toBe("Missing38");
+
+    await weighApples(user);
+    expect(missing().textContent).toBe("Missing37");
+  });
+
+  it("says so when a whole group is finished, instead of an empty box", async () => {
+    // Every frozen fruit weighed, nothing else touched.
+    const frozenDaily = config.products.filter(
+      (p) => p.group === "frozen" && p.tiers.includes("daily"),
+    );
+    localStorage.setItem(
+      STORAGE_KEY,
+      serialiseSession({
+        version: 1,
+        tier: "daily",
+        startedAt: today(),
+        entries: frozenDaily.map((p, i) => ({
+          id: `e${i}`,
+          kind: "weight",
+          productId: p.id,
+          raw: 1,
+          containerId: "none",
+          netGrams: 1000,
+        })),
+      }),
+    );
+
+    const user = userEvent.setup();
+    render(<ClosingScreen config={config} />);
+    await user.click(screen.getByRole("button", { name: /^Missing/ }));
+
+    expect(screen.getByText("Everything in this group is entered.")).toBeDefined();
+    // The unfinished groups still list their products.
+    expect(screen.getByRole("button", { name: /^Alma/ })).toBeDefined();
+  });
+});
+
+describe("collapsing a group", () => {
+  it("folds its products away and back", async () => {
+    const user = userEvent.setup();
+    render(<ClosingScreen config={config} />);
+    const header = screen.getByRole("button", {
+      name: /Fresh fruit & vegetables/,
+    });
+    expect(header.getAttribute("aria-expanded")).toBe("true");
+
+    await user.click(header);
+    expect(header.getAttribute("aria-expanded")).toBe("false");
+    expect(screen.queryByRole("button", { name: /^Alma/ })).toBeNull();
+    // Only that group folds; the others stay open.
+    expect(screen.getByRole("button", { name: /^Vanília/ })).toBeDefined();
+
+    await user.click(header);
+    expect(screen.getByRole("button", { name: /^Alma/ })).toBeDefined();
+  });
+});
+
+describe("removing an entry", () => {
+  it("takes it off the closing and out of storage", async () => {
+    const user = userEvent.setup();
+    render(<ClosingScreen config={config} />);
+    await weighApples(user);
+    expect(screen.getByText("1/38 entered")).toBeDefined();
+
+    await user.click(screen.getByRole("button", { name: /^Remove / }));
+
+    expect(screen.getByText("0/38 entered")).toBeDefined();
+    expect(screen.queryByText("2 kg")).toBeNull();
+    expect(localStorage.getItem(STORAGE_KEY)).toMatch(/"entries":\[\]/);
+  });
+
+  it("survives a refresh, like adding one does", async () => {
+    const user = userEvent.setup();
+    render(<ClosingScreen config={config} />);
+    await weighApples(user);
+    await weigh(user, "Narancs", "3");
+    await user.click(screen.getByRole("button", { name: /^Remove No container · 2 kg/ }));
+
+    cleanup();
+    render(<ClosingScreen config={config} />);
+    expect(screen.getByText("1/38 entered")).toBeDefined();
+    expect(screen.getByText("3 kg")).toBeDefined();
   });
 });

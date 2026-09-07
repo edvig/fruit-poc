@@ -3,7 +3,12 @@ import { describe, expect, it } from "vitest";
 import { computeWeightEntry } from "@/lib/calc";
 import { getConfig } from "@/lib/config";
 import { formatQuantity, formatWithUnit } from "@/lib/format";
-import { entryValue, productTotal, type Entry } from "@/lib/entries";
+import {
+  entriesFor,
+  entryValue,
+  productTotal,
+  type Entry,
+} from "@/lib/entries";
 
 const config = getConfig();
 const product = (id: string) => {
@@ -126,5 +131,73 @@ describe("formatting", () => {
   it("appends the unit", () => {
     expect(formatWithUnit(2.786, "kg")).toBe("2.786 kg");
     expect(formatWithUnit(1757, "db")).toBe("1757 db");
+  });
+});
+
+describe("litre products", () => {
+  const tej = product("egyeb-tej");
+  const entries: Entry[] = [
+    { id: "1", kind: "amount", productId: tej.id, amount: 6 },
+    { id: "2", kind: "amount", productId: tej.id, amount: 1.5 },
+    { id: "3", kind: "amount", productId: "egyeb-joghurt", amount: 2 },
+  ];
+
+  it("takes the typed amount as it stands, with no conversion", () => {
+    const carton: Entry = {
+      id: "1",
+      kind: "amount",
+      productId: tej.id,
+      amount: 6,
+    };
+    expect(entryValue(carton, "l")).toBe(6);
+  });
+
+  it("sums the litres of one product only", () => {
+    expect(productTotal(tej, entries)).toBe(7.5);
+  });
+
+  it("is zero for a product nobody entered", () => {
+    expect(productTotal(product("egyeb-agave-szirup"), entries)).toBe(0);
+  });
+});
+
+describe("entriesFor", () => {
+  const entries: Entry[] = [
+    { id: "1", kind: "amount", productId: "egyeb-tej", amount: 6 },
+    {
+      id: "2",
+      kind: "count",
+      productId: "acc-pohar-0-3",
+      packCounts: { karton: 1 },
+      pieces: 50,
+      total: 850,
+    },
+    { id: "3", kind: "amount", productId: "egyeb-tej", amount: 1.5 },
+  ];
+
+  it("picks out one product's entries, in the order they were added", () => {
+    expect(entriesFor("egyeb-tej", entries).map((e) => e.id)).toEqual([
+      "1",
+      "3",
+    ]);
+  });
+
+  it("is empty for a product with nothing entered", () => {
+    expect(entriesFor("fresh-alma", entries)).toEqual([]);
+  });
+});
+
+describe("formatting litres", () => {
+  // Litres are read off a carton, not a scale: two decimals is as fine as the
+  // number ever gets, and trailing zeros still go.
+  it("writes up to two decimals and drops trailing zeros", () => {
+    expect(formatQuantity(1.5, "l")).toBe("1.5");
+    expect(formatQuantity(0.25, "l")).toBe("0.25");
+    expect(formatQuantity(6, "l")).toBe("6");
+    expect(formatQuantity(7.125, "l")).toBe("7.13");
+  });
+
+  it("appends the unit", () => {
+    expect(formatWithUnit(1.5, "l")).toBe("1.5 l");
   });
 });

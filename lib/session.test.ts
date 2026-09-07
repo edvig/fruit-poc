@@ -79,3 +79,58 @@ describe("closing date", () => {
     expect(today(new Date(2026, 0, 5))).toBe("2026-01-05");
   });
 });
+
+describe("a saved entry whose variant or container is gone", () => {
+  // The product check is the only one parseSession makes: an entry for a
+  // deleted product could never be seen or removed, while one whose *variant*
+  // or *container* was renamed still has its own stored netGrams and stays
+  // correct on the report. These pin that deliberate difference.
+  it("keeps an entry whose variant no longer exists", () => {
+    const stale: Entry = {
+      id: "a",
+      kind: "weight",
+      productId: "fresh-narancs",
+      raw: 2.34,
+      containerId: "metal-small",
+      variantId: "candied",
+      netGrams: 2786,
+    };
+    const result = parseSession(serialiseSession(session([stale])), KNOWN);
+
+    expect(result?.dropped).toBe(0);
+    expect(result?.session.entries).toEqual([stale]);
+  });
+
+  it("keeps an entry whose container no longer exists", () => {
+    const stale: Entry = {
+      id: "a",
+      kind: "weight",
+      productId: "fresh-alma",
+      raw: 2,
+      containerId: "wooden-crate",
+      netGrams: 2000,
+    };
+    const result = parseSession(serialiseSession(session([stale])), KNOWN);
+
+    expect(result?.dropped).toBe(0);
+    expect(result?.session.entries[0]).toMatchObject({ netGrams: 2000 });
+  });
+});
+
+describe("counting what was dropped", () => {
+  it("reports how many entries went, not just that some did", () => {
+    const result = parseSession(
+      serialiseSession(
+        session([
+          entry("a", "fresh-narancs"),
+          entry("b", "fresh-retired"),
+          entry("c", "fresh-also-gone"),
+        ]),
+      ),
+      KNOWN,
+    );
+
+    expect(result?.dropped).toBe(2);
+    expect(result?.session.entries.map((e) => e.id)).toEqual(["a"]);
+  });
+});

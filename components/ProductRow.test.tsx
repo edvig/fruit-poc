@@ -18,7 +18,9 @@ const product = (id: string) => {
 /** Renders one row expanded, capturing whatever it commits. */
 function setup(productId: string, entries: Entry[] = []) {
   const added: Entry[] = [];
+  const removed: string[] = [];
   const onAdd = vi.fn((entry: Entry) => added.push(entry));
+  const onRemove = vi.fn((entryId: string) => removed.push(entryId));
   render(
     <ul>
       <ProductRow
@@ -28,11 +30,11 @@ function setup(productId: string, entries: Entry[] = []) {
         expanded
         onToggle={() => {}}
         onAdd={onAdd}
-        onRemove={() => {}}
+        onRemove={onRemove}
       />
     </ul>,
   );
-  return { added, onAdd, user: userEvent.setup() };
+  return { added, removed, onAdd, onRemove, user: userEvent.setup() };
 }
 
 describe("weighing a product with a peeled variant", () => {
@@ -140,5 +142,81 @@ describe("a product already entered in several forms", () => {
       .map((item) => item.textContent ?? "");
     expect(text.some((t) => t.includes("Peeled · 2.786 kg"))).toBe(true);
     expect(text.some((t) => t.includes("Whole · 4.622 kg"))).toBe(true);
+  });
+});
+
+describe("entering a litre product", () => {
+  it("takes the typed amount as it stands - no container, no pack math", async () => {
+    const { added, user } = setup("egyeb-tej");
+
+    // No scale is involved, so there is nothing to pick before typing.
+    expect(screen.queryByText("Container")).toBeNull();
+    await user.type(screen.getByLabelText(/Amount for Tej in l/), "1,5");
+    await user.click(screen.getByRole("button", { name: "Add to closing" }));
+
+    expect(added).toEqual([
+      expect.objectContaining({
+        kind: "amount",
+        productId: "egyeb-tej",
+        amount: 1.5,
+      }),
+    ]);
+  });
+
+  it("refuses an empty or zero amount", async () => {
+    const { added, user } = setup("egyeb-tej");
+    const add = screen.getByRole("button", { name: "Add to closing" });
+    expect(add.hasAttribute("disabled")).toBe(true);
+
+    await user.type(screen.getByLabelText(/Amount for Tej/), "0");
+    expect(add.hasAttribute("disabled")).toBe(true);
+    await user.click(add);
+    expect(added).toHaveLength(0);
+  });
+
+  it("sums several cartons into one total", () => {
+    setup("egyeb-tej", [
+      { id: "a", kind: "amount", productId: "egyeb-tej", amount: 6 },
+      { id: "b", kind: "amount", productId: "egyeb-tej", amount: 1.5 },
+    ]);
+    expect(screen.getByText("7.5 l")).toBeDefined();
+  });
+});
+
+describe("removing an entry", () => {
+  const entries: Entry[] = [
+    {
+      id: "peeled-one",
+      kind: "weight",
+      productId: "fresh-narancs",
+      raw: 2.34,
+      containerId: "metal-small",
+      variantId: "peeled",
+      netGrams: 2786,
+    },
+    {
+      id: "whole-one",
+      kind: "weight",
+      productId: "fresh-narancs",
+      raw: 5,
+      containerId: "metal-medium",
+      variantId: "whole",
+      netGrams: 4622,
+    },
+  ];
+
+  it("removes the form that was actually clicked, not the first one", async () => {
+    const { removed, user } = setup("fresh-narancs", entries);
+
+    await user.click(
+      screen.getByRole("button", { name: "Remove Whole · 4.622 kg" }),
+    );
+
+    expect(removed).toEqual(["whole-one"]);
+  });
+
+  it("offers a remove button for every entry", () => {
+    setup("fresh-narancs", entries);
+    expect(screen.getAllByRole("button", { name: /^Remove / })).toHaveLength(2);
   });
 });

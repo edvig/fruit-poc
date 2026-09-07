@@ -75,7 +75,12 @@ export interface AppConfig {
   containers: Container[];
 }
 
-function validate(config: AppConfig): void {
+/**
+ * Fails loudly on a hand-edited `config/*.json` rather than letting a typo
+ * reach the register. Exported so the rules can be tested against deliberately
+ * broken configs; the real config is checked once, on import, below.
+ */
+export function validateConfig(config: AppConfig): void {
   const problems: string[] = [];
   const groupIds = new Set(config.groups.map((g) => g.id));
   const seen = new Set<string>();
@@ -185,7 +190,7 @@ const config: AppConfig = {
   containers: containersJson.containers as Container[],
 };
 
-validate(config);
+validateConfig(config);
 
 export function getConfig(): AppConfig {
   return config;
