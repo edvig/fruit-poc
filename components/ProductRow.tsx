@@ -18,12 +18,12 @@ import {
 } from "@/lib/config-helpers";
 import {
   entriesFor,
-  entryValue,
   newEntryId,
   productTotal,
   type Entry,
 } from "@/lib/entries";
 import { formatWithUnit } from "@/lib/format";
+import { entryLabel } from "@/lib/labels";
 
 const WEIGHT_PROBLEMS: Record<WeightProblem, string> = {
   "raw-not-positive": "Enter a weight above zero.",
@@ -347,17 +347,6 @@ function AmountForm({
       <AddButton disabled={!valid} onClick={add} />
     </>
   );
-}
-
-function entryLabel(entry: Entry, product: Product, config: AppConfig): string {
-  if (entry.kind === "weight") {
-    const variant = product.variants?.find((v) => v.id === entry.variantId);
-    const container = config.containers.find((c) => c.id === entry.containerId);
-    const what = variant?.label ?? container?.name ?? "Weighed";
-    return `${what} · ${formatWithUnit(entryValue(entry, product.unit), product.unit)}`;
-  }
-  if (entry.kind === "count") return `${entry.total} db`;
-  return formatWithUnit(entry.amount, product.unit);
 }
 
 function FieldLabel({ children }: { children: React.ReactNode }) {

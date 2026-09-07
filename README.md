@@ -69,5 +69,6 @@ engine, the closing screen (Daily/Weekly/Monthly switcher + grouped product
 list, following `design/fruitisimo-closing/`), and the entry flow — weigh or
 count a product and commit it, with multi-form products summed into one line.
 The in-progress closing is kept in localStorage, so a refresh or a phone
-locking mid-closing loses nothing. The summary view and xlsx export come
-next.
+locking mid-closing loses nothing. A second screen at `/summary` reviews the
+closing — totals per product, multi-form items broken down, and what is still
+outstanding. The xlsx export comes next.

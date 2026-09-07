@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useMemo, useState, useSyncExternalStore } from "react";
 
 import ProductRow from "@/components/ProductRow";
@@ -284,6 +285,13 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
             </section>
           );
         })}
+
+        <Link
+          href="/summary"
+          className="flex h-12 items-center justify-center rounded-xl bg-slate-900 text-[15px] font-semibold text-white no-underline"
+        >
+          Review &amp; export
+        </Link>
 
         <div className="pt-2">
           {confirmingReset ? (

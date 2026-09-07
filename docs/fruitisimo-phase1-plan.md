@@ -187,6 +187,21 @@ screen.
 - **Done when:** the summary total for a multi-form item matches the sum of
   its individual entries, and any entry can be corrected without redoing the
   whole closing.
+- **Status:** done. `/summary` is a second screen, following the
+  `Summary.dc.html` artboard: entered/not-entered stat row, one line per
+  entered product grouped as on the entry screen, and a "Not entered" list of
+  everything still outstanding. A per-form breakdown appears **only** when a
+  product has more than one entry, so single-entry products stay uncluttered.
+- Following the design, the summary is a read-only snapshot — correction
+  happens on the entry screen, which already has removable per-entry chips.
+  Missing products are listed but don't gate anything.
+- `lib/summary.ts` builds the model as a pure function, so the totals are
+  testable without a screen; `lib/labels.ts` describes an entry ("Peeled ·
+  2.786 kg", "2 karton + 1 csomag + 7 loose") and is shared with the entry
+  chips so the two can't drift.
+- Verified: the multi-form orange totals 7.408 kg and its parts sum to exactly
+  7408 g; the missing list scopes itself to the selected closing type; entries
+  for products outside the tier are ignored. 145 tests pass.
 
 ## Step 8 — xlsx export
 **Goal:** get the report out of the app and into a file.
