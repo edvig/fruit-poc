@@ -1,19 +1,19 @@
-Tárolók
-Fém
+# Containers
 
-- 19g
-- 276g
-- 378g
-- 492g
-- 620g
-- 750g (fagyi)
-  Műanyag
-- 263g
-- 393g
-  Kosár
-- 600
+## Metal
 
-Narancs, Grapefruit - 1.35x
-Dinnye 1.4x
-Citrom, Lime - 1.35x
-s
+- mini - 19g
+- small - 276g
+- medium - 378g
+- large - 492g
+- extra large - 620g
+- ice cream tray - 750g
+
+## Plastic
+
+- small - 263g
+- large - 393g
+
+## Deco container
+
+- basket - 600g

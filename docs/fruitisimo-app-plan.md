@@ -7,23 +7,51 @@ mental-math multipliers (e.g. peeled vs. unpeeled), count items separately, and
 do all of the math on a phone calculator — then write/report the results
 somewhere. It's slow and error-prone because the rules live in people's heads.
 
-## Architecture (recommended)
+## Architecture (decided, post Phase 0)
 
-- **Frontend:** Web app (React), mobile-responsive. Chosen over native because
-  it's your stronger stack and distribution is trivial — just a URL, no app
-  store, works on whatever device is at the register (phone, tablet, PC).
-- **Backend (from Phase 2):** Lightweight REST API (Node/Express) + a small
-  relational database (Postgres, or SQLite if kept very simple). One store,
-  one register at first — schema still models `store_id` / `register_id` from
-  day one so multi-store later isn't a rewrite.
-- **Core entities:** `Product` (name, unit, type: weighed/counted),
-  `Container` (name, tare weight), `Variant/Multiplier` (per product — e.g.
-  peeled/unpeeled), `ClosingEntry` (product, container, variant, raw value,
-  computed net, timestamp), `ClosingSession` (a day's closing), `Report`.
-- **Hosting:** simple platform (Vercel/Render/Railway-class) — no need for
-  more than that at this scale.
-- **Auth:** none needed while it's one register; add a simple login/PIN in
-  Phase 4 when multiple people/stores are involved.
+- **Frontend:** React (Vite), heavily mobile-responsive. Runs on the PC or phone at
+  the register — both confirmed always online, so no offline handling needed. Important to store the filled data into local storage, so a page refresh wont delete the current closing.
+- **Backend:** Node.js + Express from day one (not deferred) — one process
+  serves both the API and the built React app, so there's a single deploy.
+  Reasons to have it now rather than later: xlsx generation and (future)
+  email sending are both easier to do server-side, and it gives a natural
+  home for config even before there's a database.
+- **Config, not hardcoding:** products/containers/multipliers live in an
+  editable JSON file read by the backend (e.g. `config/products.json`,
+  `config/containers.json`) — editable directly without touching app code.
+  A future admin UI (Phase 3) would just read/write the same file, or migrate
+  it into a database if it grows unwieldy.
+- **No database (for now):** confirmed no history needs to be kept — results
+  are hand-copied into the Czech accounting system after each closing.
+  Persistence can be added later without touching the calculation logic.
+- **Report export:** a single-sheet xlsx summary (item → total, with a
+  breakdown when an item has multiple measured forms) generated server-side.
+  Deliberately _not_ trying to mirror the existing multi-sheet Daily/Weekly/
+  Monthly template yet — start simple, refine once the simple version is in
+  use. Email delivery of the xlsx is a known future step, not now.
+- **Hosting:** Render's free web-service tier (Node/Express + built React app
+  in one deploy). Free, and fine for ~1-2 uses/day; the tradeoff is a cold
+  start (~30-50s) after 15 minutes idle, which is a non-issue at this usage
+  level. Moving off free tier later ($7/mo-class) removes the cold start if
+  it ever becomes annoying. Vercel was tried but isn't the pick going forward.
+- **Auth:** none needed while it's one register; revisit in Phase 4 if
+  multiple stores/registers arrive.
+
+## What Phase 0 actually found (real data, not placeholders)
+
+- Full product list, categories, and daily/weekly/monthly tiers: `items.md`.
+- Container tare weights (Metal: mini 19g → ice cream tray 750g; Plastic:
+  small 263g / large 393g; Deco basket 600g): `containers.md`.
+- Multipliers apply only to peeled citrus/melon (Narancs, Grapefruit, Dinnye,
+  Citrom, Lime), are **greater than 1** (1.35-1.4×) — they scale a peeled
+  weight _up_ to a whole-fruit equivalent — and are applied **after** tare
+  deduction: `net = (raw − tare) × multiplier`.
+- A product measured in multiple forms (e.g. some peeled, some not) is
+  recorded per-form but summed into one total for the report.
+- Open item to double check with Fruitisimo: the monthly sheet in the real
+  template (`inventory.xlsx`) includes several categories (coffee, sugar,
+  vitrine items, decorations, cleaning supplies) not present in the weekly
+  sheet or in `items.md` — worth confirming whether those are in scope.
 
 ## Phase 0 — Discovery (no code)
 
@@ -37,25 +65,30 @@ somewhere. It's slow and error-prone because the rules live in people's heads.
 - **Exit criteria:** for every product, you can write down exactly how its
   final quantity is derived from a raw scale reading or a count.
 
-## Phase 1 — POC / calculator core _(built today, with placeholder data)_
+## Phase 1 — Real POC (React + Express, real config)
 
-**Goal:** prove the core calculation logic and interaction model — replace
-the calculator + mental math, nothing else yet.
+**Goal:** prove the core calculation logic and interaction model with real
+Fruitisimo data — replace the calculator + mental math, nothing else yet.
 
-- Config-driven product / container / multiplier list (hardcoded placeholder
-  data until Phase 0 gives real numbers).
+- React frontend + Express backend, backend serving the real product/
+  container/multiplier config from JSON (see "What Phase 0 actually found").
+- Closing-type selector: Daily / Weekly / Monthly, each showing the right
+  subset of products (daily is a subset of weekly, per the real data).
 - Add-entry flow: pick product → pick container (if weighed) → enter raw
-  weight → auto-deduct tare → apply variant multiplier → see the net result
-  before committing it.
-- Separate flow for counted items (desserts, cups).
+  weight → auto-deduct tare → apply the real multiplier (only for the 5
+  peeled citrus/melon items) → see the net result before committing it.
+- Separate flow for counted items (accessories, vitrine items).
+- Multi-form items (e.g. some peeled, some not) recorded per-form, summed
+  into one total.
 - Running list of the day's entries, editable/removable.
-- On-screen summary totals, exportable as plain text.
-- Intentionally **no login, no database** — resets on refresh, single
-  session. That's fine; it's here to validate the _logic and UX_, not to go
-  live.
-- **Exit criteria:** someone could do a full closing entirely inside the app
-  with zero calculator/mental math, using real Fruitisimo numbers once you
-  swap in the config.
+- Single-sheet xlsx export of the summary (item → total, with a per-form
+  breakdown where relevant) — no attempt yet to match the full existing
+  multi-sheet template.
+- Intentionally **no login, no persisted history** — matches the confirmed
+  "no need to store this" requirement. Deployed on Render's free tier.
+- **Exit criteria:** someone could do a full daily/weekly/monthly closing
+  entirely inside the app, download the xlsx, and hand-copy it into the
+  Czech system with zero calculator/mental math.
 
 ## Phase 2 — Persistence & the real report
 
