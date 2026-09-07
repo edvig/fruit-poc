@@ -90,6 +90,12 @@ actually read, with a schema that has room for everything Phase 0 found
   of operations fails 5 of them, so they have teeth. `lib/config.test.ts`
   covers the `defaultContainer` resolution added in `containers.md` (ice cream
   group → ice cream tray).
+- **Review pass (during Step 4):** the engine survived the config growing to
+  132 products, 8 groups and the new `l` unit / `amount` kind — `toGrams` and
+  `fromGrams` reject volumes explicitly rather than silently returning
+  `undefined`. One gap found and closed: counts had no counterpart to
+  `checkWeightEntry`, so `checkCountEntry` now rejects fractional and negative
+  box/pack/piece counts.
 
 ## Step 4 — Closing-type & product selection UI
 **Goal:** get to the right product list for the right closing, on a phone
@@ -101,6 +107,17 @@ screen.
   the screen staff will actually be looking at while standing at the scale.
 - **Done when:** switching closing type correctly filters the product list,
   and it's comfortably usable one-handed on a phone.
+- **Status:** built. `components/ClosingScreen.tsx` follows the design canvas
+  in `design/fruitisimo-closing/` — sticky header with Daily/Weekly/Monthly
+  tabs, progress bar, All/Missing chips, then collapsible groups with emoji.
+  `app/page.tsx` is a server component that reads the config and passes it as
+  props, so the product list is in the HTML on first paint (no spinner, no API
+  round trip before staff can start). Verified against the rendered markup:
+  the Daily view shows exactly 38 rows across 3 groups, with accessories
+  correctly absent (weekly-only) and no monthly-only product leaking in.
+  Product rows are static for now; Step 5 turns them into the accordion the
+  design shows, rather than shipping a tap affordance that does nothing.
+  The one-handed phone check belongs to Step 9.
 
 ## Step 5 — Entry flow
 **Goal:** the actual "weigh → get a number" interaction.

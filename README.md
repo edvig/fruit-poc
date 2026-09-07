@@ -64,5 +64,7 @@ config — run `npm test`.
 
 ## Status
 
-Phase 1, Steps 1-3 done: scaffolding, real config over the API, and the
-tested calculation engine. Entry flow and xlsx export come next.
+Phase 1, Steps 1-4 done: scaffolding, real config, the tested calculation
+engine, and the closing screen (Daily/Weekly/Monthly switcher + grouped
+product list, following `design/fruitisimo-closing/`). The entry flow, session
+persistence, and xlsx export come next.

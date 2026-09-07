@@ -209,7 +209,7 @@ Four open points settled before Phase 1 Step 1 starts:
 
 **Where we are:** Phase 0 is done (see `fruitisimo-phase0-discovery.md`).
 Phase 1 is broken into steps in `fruitisimo-phase1-plan.md`; Step 1
-(scaffolding), Step 2 (real config over `GET /api/config`) and Step 3 (the
-calculation engine, with tests) are built and verified locally, with the first
-Vercel deploy still to happen. Step 4 (closing-type and product selection UI)
-is next.
+(scaffolding), Step 2 (real config), Step 3 (the calculation engine, with
+tests) and Step 4 (closing-type switcher and product list) are built and
+verified locally, with the first Vercel deploy still to happen. Step 5 (the
+entry flow) is next.

@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 
 import {
+  checkCountEntry,
   checkWeightEntry,
   computeCountEntry,
   computeNetGrams,
@@ -252,5 +253,28 @@ describe("the real config's multipliers", () => {
         expect(v.multiplier).toBeGreaterThanOrEqual(1);
       }
     }
+  });
+});
+
+describe("count validation", () => {
+  it("rejects fractional boxes and packs", () => {
+    expect(checkCountEntry({ packCounts: { karton: 1.5 } })).toBe(
+      "count-not-integer",
+    );
+    expect(checkCountEntry({ pieces: 0.5 })).toBe("count-not-integer");
+  });
+
+  it("rejects negative counts", () => {
+    expect(checkCountEntry({ packCounts: { karton: -1 } })).toBe(
+      "count-negative",
+    );
+    expect(checkCountEntry({ pieces: -3 })).toBe("count-negative");
+  });
+
+  it("passes a normal count", () => {
+    expect(
+      checkCountEntry({ packCounts: { karton: 2, csomag: 3 }, pieces: 7 }),
+    ).toBeNull();
+    expect(checkCountEntry({})).toBeNull();
   });
 });

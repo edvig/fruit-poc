@@ -128,6 +128,26 @@ export function computeCountEntry({
   return total;
 }
 
+export type CountProblem = "count-not-integer" | "count-negative";
+
+/**
+ * The counterpart to checkWeightEntry: boxes, packs and loose pieces are all
+ * whole things, so a fractional or negative count is a typo, not a quantity.
+ */
+export function checkCountEntry({
+  packCounts = {},
+  pieces = 0,
+}: {
+  packCounts?: Record<string, number>;
+  pieces?: number;
+}): CountProblem | null {
+  for (const value of [...Object.values(packCounts), pieces]) {
+    if (!Number.isInteger(value)) return "count-not-integer";
+    if (value < 0) return "count-negative";
+  }
+  return null;
+}
+
 /**
  * A product measured in several forms (some peeled, some not; two containers)
  * is one line on the report. Phase 0: record per form, report the sum.
