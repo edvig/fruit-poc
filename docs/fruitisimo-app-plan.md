@@ -9,18 +9,20 @@ somewhere. It's slow and error-prone because the rules live in people's heads.
 
 ## Architecture (decided, post Phase 0)
 
-- **Frontend:** React (Vite), heavily mobile-responsive. Runs on the PC or phone at
+- **Frontend:** React via Next.js (App Router, TypeScript), heavily mobile-responsive.
+  Runs on the PC or phone at
   the register — both confirmed always online, so no offline handling needed. Important to store the filled data into local storage, so a page refresh wont delete the current closing.
-- **Backend:** Node.js + Express from day one (not deferred) — one process
-  serves both the API and the built React app, so there's a single deploy.
-  Reasons to have it now rather than later: xlsx generation and (future)
-  email sending are both easier to do server-side, and it gives a natural
-  home for config even before there's a database.
+- **Backend:** Next.js route handlers (`app/api/*`) from day one (not
+  deferred) — the same project serves both the API and the UI, so there's a
+  single deploy. Reasons to have a backend now rather than later: xlsx
+  generation and (future) email sending are both easier to do server-side,
+  and it gives a natural home for config even before there's a database.
 - **Config, not hardcoding:** products/containers/multipliers live in an
   editable JSON file read by the backend (e.g. `config/products.json`,
   `config/containers.json`) — editable directly without touching app code.
-  A future admin UI (Phase 3) would just read/write the same file, or migrate
-  it into a database if it grows unwieldy.
+  A future admin UI (Phase 3) can't write that file back, though — serverless
+  hosting has a read-only filesystem — so self-serve editing means moving the
+  config into a database at that point.
 - **No database (for now):** confirmed no history needs to be kept — results
   are hand-copied into the Czech accounting system after each closing.
   Persistence can be added later without touching the calculation logic.
@@ -29,11 +31,16 @@ somewhere. It's slow and error-prone because the rules live in people's heads.
   Deliberately _not_ trying to mirror the existing multi-sheet Daily/Weekly/
   Monthly template yet — start simple, refine once the simple version is in
   use. Email delivery of the xlsx is a known future step, not now.
-- **Hosting:** Render's free web-service tier (Node/Express + built React app
-  in one deploy). Free, and fine for ~1-2 uses/day; the tradeoff is a cold
-  start (~30-50s) after 15 minutes idle, which is a non-issue at this usage
-  level. Moving off free tier later ($7/mo-class) removes the cold start if
-  it ever becomes annoying. Vercel was tried but isn't the pick going forward.
+- **Hosting:** Vercel's free tier — Next.js is Vercel's own framework, so it's
+  zero-config, and the pages are served static from a CDN with only the API
+  running as serverless functions. **No idle cold start**, which matters
+  because this gets demoed: an app that makes you wait ~30-50s on the first
+  request demos badly. Render (a long-running Express process) was the earlier
+  pick and is the better shape for a heavy production backend, but its free
+  tier sleeps after 15 minutes idle. Revisit if this ever stops being a demo:
+  serverless means no persistent process, no writable filesystem, and Phase 2's
+  database has to be a serverless-friendly one (Neon / Supabase / Vercel
+  Postgres) rather than a plain connection pool.
 - **Auth:** none needed while it's one register; revisit in Phase 4 if
   multiple stores/registers arrive.
 
@@ -65,13 +72,13 @@ somewhere. It's slow and error-prone because the rules live in people's heads.
 - **Exit criteria:** for every product, you can write down exactly how its
   final quantity is derived from a raw scale reading or a count.
 
-## Phase 1 — Real POC (React + Express, real config)
+## Phase 1 — Real POC (Next.js, real config)
 
 **Goal:** prove the core calculation logic and interaction model with real
 Fruitisimo data — replace the calculator + mental math, nothing else yet.
 
-- React frontend + Express backend, backend serving the real product/
-  container/multiplier config from JSON (see "What Phase 0 actually found").
+- Next.js frontend + route handlers serving the real product/container/
+  multiplier config from JSON (see "What Phase 0 actually found").
 - Closing-type selector: Daily / Weekly / Monthly, each showing the right
   subset of products (daily is a subset of weekly, per the real data).
 - Add-entry flow: pick product → pick container (if weighed) → enter raw
@@ -85,7 +92,7 @@ Fruitisimo data — replace the calculator + mental math, nothing else yet.
   breakdown where relevant) — no attempt yet to match the full existing
   multi-sheet template.
 - Intentionally **no login, no persisted history** — matches the confirmed
-  "no need to store this" requirement. Deployed on Render's free tier.
+  "no need to store this" requirement. Deployed on Vercel's free tier.
 - **Exit criteria:** someone could do a full daily/weekly/monthly closing
   entirely inside the app, download the xlsx, and hand-copy it into the
   Czech system with zero calculator/mental math.
@@ -127,7 +134,54 @@ Fruitisimo data — replace the calculator + mental math, nothing else yet.
 
 ---
 
-**Where we are:** Phase 0 hasn't happened yet (your meeting). Phase 1 POC is
-built alongside this plan using realistic placeholder data — swap in
-Fruitisimo's real products/containers/multipliers once you have them, and
-the same app should already work.
+## Decisions locked in (2026-09-07)
+
+Four open points settled before Phase 1 Step 1 starts:
+
+1. **Stack: Next.js + Vercel, rebuilt from scratch.** The pre-Phase-0 POC
+   (`components/FruitisimoClosingPOC.jsx`, placeholder products with
+   multipliers < 1) is retired — its data contradicts what Phase 0 found. The
+   framework choice went back and forth: the post-Phase-0 plan said Vite +
+   Express on Render, and that was built and working, but it was replaced with
+   Next.js + Vercel because **this is a demo and Render's free tier cold start
+   would be visible during it**, and because Next.js is the familiar ground
+   here. Scaffold is Next.js 16 (App Router) + React 19 + TypeScript +
+   Tailwind 4. The old POC stays in git history as a reference for the
+   entry-flow UI shape.
+2. **Monthly = the full `Havi Leltár` sheet**, not a copy of weekly: it also
+   covers VITRIN (cake cups, snack bowls, muffins, drinks), SZELETEK,
+   DECOS/packaging, KÁVÉ, sugar, and cleaning supplies — all counted (`db`) —
+   plus frozen fruit tracked per package size (`Fagyasztott áfonya 2,5kg`
+   etc.), which pairs with the workbook's separate "opened packages" sheet.
+   **Deferred, though:** Phase 1 builds **daily + weekly first** — they share
+   one sheet, with weekly-only items marked by cell colour. `items.md` now
+   documents the monthly categories too, but it ends with a list of open
+   questions (missing products, per-sheet name drift, unit oddities) that need
+   answering before monthly can be built.
+3. **Counted items are entered as cartons + packs + pieces**, auto-multiplied
+   into one piece total using the pack sizes written into the sheet's own
+   labels (e.g. `Pohár 0,3 — 800/karton, 50/csomag`). This removes mental math
+   that today happens on the calculator. Pack sizes become config data and
+   need one confirmation pass with Fruitisimo.
+4. **English UI, Hungarian data.** All interface text in English; product,
+   category, and container names stay exactly as Fruitisimo writes them
+   (`items.md` / the xlsx), since those are what staff read off the sheet and
+   what gets hand-copied into the Czech system.
+
+### Known data cleanups for the config step
+
+- Names drift between the daily and monthly sheets: "Vegán kókusz" vs
+  "Kókusz vegan", "Barackos joghurt fagyi" vs "Barackos joghurt". Pick one
+  display name per product, keyed by a stable id.
+- Four names collide across fresh and frozen (eper, mangó, ananász, gyömbér)
+  — they are separate report lines and need distinct ids.
+- "Szezonális fagyi" ×3 and "Fagyasztott szezonális" ×2 are blank slots in the
+  real sheet; treat them as user-nameable entries rather than fixed products.
+- Units differ by category (fruit kg, ice cream g, accessories db) while every
+  tare in `containers.md` is grams — the calculation engine should work in a
+  single internal unit and format per category on output.
+
+**Where we are:** Phase 0 is done (see `fruitisimo-phase0-discovery.md`), and
+Phase 1 is broken into steps in `fruitisimo-phase1-plan.md`. Step 1
+(scaffolding + deploy) has not been started; the code in the repo today is the
+retired pre-Phase-0 POC.

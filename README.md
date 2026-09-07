@@ -1,39 +1,49 @@
-# fruit-poc
+# Fruitisimo Closing App
 
-Minimal Next.js app: one page that calls one API route. Proves out the
-"frontend + backend in one repo, deployed to Vercel" pattern for future POCs.
+Replaces the phone-calculator + mental-math part of Fruitisimo's register
+closing: weigh a product, subtract the container tare, apply the peeled-fruit
+multiplier, count the accessories, and get one item → total summary to copy
+into the Czech system.
+
+Planning docs live in [`docs/`](docs/) — start with
+`fruitisimo-app-plan.md` (architecture + decisions) and
+`fruitisimo-phase1-plan.md` (the step-by-step build order).
+
+## Stack
+
+- Next.js 16 (App Router) + React 19 + TypeScript + Tailwind 4.
+- `app/` — pages; `app/api/*` — route handlers (the backend). One project,
+  one deploy.
+- No database. Config lives in JSON in the repo; the in-progress closing lives
+  in the browser's localStorage.
+- UI text in English, product/container names in Hungarian as Fruitisimo
+  writes them.
 
 ## Run locally
 
 ```bash
 npm install
-npm run dev
+npm run dev        # http://localhost:3000
 ```
 
-Open http://localhost:3000 — the page shows "Hello, world" plus a message
-fetched from `/api/fruit`, so you know both halves work.
+The page shows whether `GET /api/health` succeeded, which proves the UI and
+the API halves are talking to each other.
 
-Open http://localhost:3000/fruitisimo for the Fruitisimo closing POC
-component (`components/FruitisimoClosingPOC.jsx`). It's a plain `.jsx`
-file (no TypeScript) — Next.js compiles it right alongside the `.tsx`
-files, no extra config needed beyond what's already in this repo
-(Tailwind + lucide-react were added specifically for this component).
+```bash
+npm run build      # production build
+npm start          # serve the production build
+npm run typecheck  # tsc --noEmit
+```
 
-## Deploy to Vercel (free)
+## Deploy (Vercel, free tier)
 
-1. Push this folder to a new GitHub repo:
-   ```bash
-   git init
-   git add .
-   git commit -m "fruit poc"
-   git branch -M main
-   git remote add origin <your-repo-url>
-   git push -u origin main
-   ```
-2. Go to https://vercel.com, sign in with GitHub, click "Add New Project",
-   pick this repo, click Deploy. No config needed — Vercel auto-detects
-   Next.js.
-3. You'll get a live `https://fruit-poc-xxxx.vercel.app` URL in ~1 minute.
-4. (Optional) Add a custom domain under Project Settings → Domains.
+Vercel auto-detects Next.js — import the repo at vercel.com and deploy, no
+config needed. Every push to `main` redeploys.
 
-Every future push to `main` auto-redeploys.
+Pages are served static from the CDN and only `app/api/*` runs as serverless
+functions, so there's no idle cold start.
+
+## Status
+
+Phase 1, Step 1 (scaffolding + deploy pipeline) — the app is an empty skeleton
+with a health check. Real config, calculation, and entry flows come next.

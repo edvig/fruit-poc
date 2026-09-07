@@ -1,3 +1,23 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@layer base {
+  html {
+    /* Stop iOS Safari from resizing text when the phone is rotated. */
+    -webkit-text-size-adjust: 100%;
+  }
+
+  body {
+    @apply bg-white text-slate-900 antialiased;
+    /* Staff tap through this app fast; never zoom on a double-tap. */
+    touch-action: manipulation;
+  }
+
+  /* iOS zooms the whole page when focusing an input under 16px. Every weight
+     entry goes through one of these, so keep them at 16px minimum. */
+  input,
+  select,
+  textarea,
+  button {
+    font-size: max(1rem, 16px);
+  }
+}
