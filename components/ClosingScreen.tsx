@@ -2,7 +2,9 @@
 
 import { useMemo, useState } from "react";
 
-import type { AppConfig, ClosingTier, Product } from "@/lib/config";
+import ProductRow from "@/components/ProductRow";
+import type { AppConfig, ClosingTier } from "@/lib/config";
+import type { Entry } from "@/lib/entries";
 
 const TIERS: { id: ClosingTier; label: string }[] = [
   { id: "daily", label: "Daily" },
@@ -35,10 +37,18 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
   const [tier, setTier] = useState<ClosingTier>("daily");
   const [filter, setFilter] = useState<"all" | "missing">("all");
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
+  const [expandedId, setExpandedId] = useState<string | null>(null);
+  const [entries, setEntries] = useState<Entry[]>([]);
 
-  // Step 5 fills this in as entries are added; until then every product reads
-  // as not entered, which is exactly the state a closing starts in.
-  const entryCounts: Record<string, number> = useMemo(() => ({}), []);
+  // How many entries each product has, for the progress bar and the Missing
+  // filter. Step 6 persists `entries` to localStorage.
+  const entryCounts = useMemo(() => {
+    const counts: Record<string, number> = {};
+    for (const entry of entries) {
+      counts[entry.productId] = (counts[entry.productId] ?? 0) + 1;
+    }
+    return counts;
+  }, [entries]);
 
   const products = useMemo(
     () => config.products.filter((p) => p.tiers.includes(tier)),
@@ -160,7 +170,22 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
               {!isCollapsed && (
                 <ul className="flex flex-col gap-2">
                   {group.products.map((product) => (
-                    <ProductRow key={product.id} product={product} />
+                    <ProductRow
+                      key={product.id}
+                      product={product}
+                      config={config}
+                      entries={entries}
+                      expanded={expandedId === product.id}
+                      onToggle={() =>
+                        setExpandedId((id) =>
+                          id === product.id ? null : product.id,
+                        )
+                      }
+                      onAdd={(entry) => setEntries((all) => [...all, entry])}
+                      onRemove={(entryId) =>
+                        setEntries((all) => all.filter((e) => e.id !== entryId))
+                      }
+                    />
                   ))}
                   {group.products.length === 0 && (
                     <li className="px-3.5 py-3 text-[13px] text-slate-400">
@@ -174,22 +199,6 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
         })}
       </div>
     </div>
-  );
-}
-
-function ProductRow({ product }: { product: Product }) {
-  return (
-    <li className="rounded-xl border border-slate-200 px-3.5 py-3">
-      <div className="flex min-h-[22px] items-center justify-between gap-2.5">
-        <span className="text-[14.5px] font-medium">{product.name}</span>
-        <span className="flex items-center gap-2">
-          <span className="text-[12.5px] font-medium text-amber-700">
-            Not entered
-          </span>
-          <span className="text-[11px] text-slate-400">{product.unit}</span>
-        </span>
-      </div>
-    </li>
   );
 }
 

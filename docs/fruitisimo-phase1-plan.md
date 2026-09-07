@@ -130,6 +130,23 @@ screen.
 - "Add to closing" commits the entry.
 - **Done when:** every product type (plain weighed, weighed-with-variant,
   counted) can be entered correctly, matching Step 3's test cases.
+- **Status:** done. `components/ProductRow.tsx` expands a row into the form
+  the design shows: two-level container picker (group, then size when the
+  group has several), variant chips, raw weight, a live net preview, and
+  "Add to closing". Counted products get box/pack/loose steppers; the config's
+  `amount` products (litres) get a plain amount field. Committed entries appear
+  as removable chips under the product, with the product's row showing the
+  summed total — the multi-form case from Phase 0.
+- Entry model lives in `lib/entries.ts`; `lib/format.ts` writes quantities
+  (kilos to the gram, counts whole). Container and form stay selected after
+  adding, since several trays of one product in a row is the normal case.
+- Verified by component tests driving the real UI (`ProductRow.test.tsx`,
+  React Testing Library): the peeled-orange case typed **with a comma** —
+  Hungarian keyboards give `2,34`, not `2.34` — previews `Net 2.786 kg` and
+  commits `netGrams: 2786`, matching Step 3 exactly; the ice cream tray is
+  preselected and deducts its 750 g; boxes and packs multiply up (2 karton +
+  1 csomag = 1650 db); a weight below the container's tare is refused with the
+  Add button disabled. 48 tests pass.
 
 ## Step 6 — Session persistence (localStorage)
 **Goal:** a page refresh or a phone locking mid-closing doesn't lose work.

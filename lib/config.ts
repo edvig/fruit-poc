@@ -1,5 +1,6 @@
 import containersJson from "@/config/containers.json";
 import productsJson from "@/config/products.json";
+import { resolveDefaultContainer } from "@/lib/config-helpers";
 
 export const CLOSING_TIERS = ["daily", "weekly", "monthly"] as const;
 export const UNITS = ["kg", "g", "db", "l"] as const;
@@ -199,9 +200,5 @@ export function productsForTier(tier: ClosingTier): Product[] {
  * group's, else none - staff pick from the full list either way.
  */
 export function defaultContainerFor(product: Product): Container | undefined {
-  if (product.kind !== "weight") return undefined;
-  const id =
-    product.defaultContainer ??
-    config.groups.find((g) => g.id === product.group)?.defaultContainer;
-  return id ? config.containers.find((c) => c.id === id) : undefined;
+  return resolveDefaultContainer(config, product);
 }

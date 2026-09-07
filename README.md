@@ -64,7 +64,8 @@ config — run `npm test`.
 
 ## Status
 
-Phase 1, Steps 1-4 done: scaffolding, real config, the tested calculation
-engine, and the closing screen (Daily/Weekly/Monthly switcher + grouped
-product list, following `design/fruitisimo-closing/`). The entry flow, session
-persistence, and xlsx export come next.
+Phase 1, Steps 1-5 done: scaffolding, real config, the tested calculation
+engine, the closing screen (Daily/Weekly/Monthly switcher + grouped product
+list, following `design/fruitisimo-closing/`), and the entry flow — weigh or
+count a product and commit it, with multi-form products summed into one line.
+Session persistence (localStorage) and the xlsx export come next.
