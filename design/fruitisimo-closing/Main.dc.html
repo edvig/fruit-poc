@@ -1,0 +1,709 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  .app {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #0f172a;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  a { color: #047857; }
+  a:hover { color: #065f46; }
+
+  .header {
+    flex: none;
+    background: #ffffff;
+    border-bottom: 1px solid #e2e8f0;
+    padding: 14px 16px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .title-row { display: flex; align-items: baseline; justify-content: space-between; }
+  .title { font-size: 17px; font-weight: 600; color: #0f172a; letter-spacing: -0.01em; }
+  .subtitle { font-size: 12px; color: #94a3b8; }
+
+  .tabs { display: flex; gap: 4px; background: #f1f5f9; padding: 3px; border-radius: 10px; }
+  .tab { flex: 1; text-align: center; padding: 8px 0; border-radius: 8px; font-size: 13.5px; font-weight: 500; color: #64748b; }
+  .tab.active { background: #ffffff; color: #0f172a; box-shadow: 0 1px 2px rgba(15,23,42,0.08); }
+
+  .progress-row { display: flex; align-items: center; gap: 10px; }
+  .progress-track { flex: 1; height: 6px; border-radius: 999px; background: #e2e8f0; overflow: hidden; }
+  .progress-fill { height: 100%; background: #047857; border-radius: 999px; }
+  .progress-label { font-size: 12px; color: #64748b; white-space: nowrap; font-variant-numeric: tabular-nums; }
+
+  .filter-row { display: flex; gap: 6px; }
+  .chip { padding: 6px 12px; border-radius: 999px; font-size: 12px; font-weight: 500; border: 1px solid #e2e8f0; color: #64748b; background: #ffffff; }
+  .chip.active { background: #0f172a; color: #ffffff; border-color: #0f172a; }
+  .chip .count { opacity: .65; margin-left: 4px; }
+
+  .body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px 16px 24px; display: flex; flex-direction: column; gap: 20px; }
+
+  .group { display: flex; flex-direction: column; gap: 8px; }
+  .group-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 13px; background: #f1f5f9; border-radius: 11px; }
+  .group-head-left { display: flex; align-items: center; gap: 9px; min-width: 0; }
+  .group-emoji { font-size: 17px; line-height: 1; flex: none; }
+  .group-label { font-size: 15px; font-weight: 700; color: #1e293b; }
+  .group-right { display: flex; align-items: center; gap: 8px; flex: none; }
+  .group-count { font-size: 12.5px; font-weight: 600; color: #64748b; font-variant-numeric: tabular-nums; }
+  .group-chevron { width: 16px; height: 16px; color: #64748b; flex: none; }
+  .products { display: flex; flex-direction: column; gap: 8px; }
+
+  .row { border-radius: 12px; padding: 12px 14px; display: flex; flex-direction: column; }
+  .row-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; min-height: 22px; }
+  .row-name { font-size: 14.5px; font-weight: 500; color: #0f172a; }
+  .row-status { display: flex; align-items: center; gap: 8px; }
+  .status-value { font-size: 14px; font-weight: 600; color: #0f172a; font-variant-numeric: tabular-nums; }
+  .status-missing-text { font-size: 12.5px; font-weight: 500; color: #b45309; }
+  .status-dot { width: 7px; height: 7px; border-radius: 999px; flex: none; }
+  .chevron { width: 16px; height: 16px; color: #94a3b8; flex: none; }
+
+  .entry-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 9px; }
+  .entry-chip { display: flex; align-items: center; gap: 7px; background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 5px 8px 5px 10px; font-size: 12px; color: #334155; }
+  .entry-chip-remove { width: 16px; height: 16px; border-radius: 999px; background: #e2e8f0; color: #64748b; display: flex; align-items: center; justify-content: center; flex: none; }
+
+  .form { margin-top: 12px; padding-top: 12px; border-top: 1px dashed #e2e8f0; display: flex; flex-direction: column; gap: 12px; }
+  .field-label { font-size: 11px; font-weight: 600; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.04em; margin-bottom: 6px; }
+
+  .chip-scroll { display: flex; gap: 6px; overflow-x: auto; -webkit-overflow-scrolling: touch; scrollbar-width: none; padding-bottom: 2px; }
+  .chip-scroll::-webkit-scrollbar { display: none; }
+  .container-chip { flex: none; padding: 8px 13px; border-radius: 10px; font-size: 12.5px; font-weight: 500; border: 1px solid #e2e8f0; color: #334155; background: #ffffff; white-space: nowrap; }
+  .container-chip.selected { background: #0f172a; color: #ffffff; border-color: #0f172a; }
+  .container-chip.size { padding: 7px 12px; font-size: 12px; background: #f8fafc; }
+  .container-chip.size.selected { background: #334155; border-color: #334155; }
+  .size-row { margin-top: 6px; }
+
+  .variant-row { display: flex; gap: 4px; background: #f1f5f9; padding: 3px; border-radius: 10px; }
+  .variant-pill { flex: 1; text-align: center; padding: 9px 0; border-radius: 8px; font-size: 13px; font-weight: 500; color: #475569; }
+  .variant-pill.selected { background: #ffffff; color: #0f172a; box-shadow: 0 1px 2px rgba(15,23,42,0.08); }
+
+  .weight-input-row { display: flex; align-items: center; gap: 10px; border: 1px solid #cbd5e1; border-radius: 10px; padding: 10px 14px; }
+  .weight-input { flex: 1; min-width: 0; border: none; outline: none; background: transparent; font-size: 20px; font-weight: 600; color: #0f172a; font-family: inherit; }
+  .weight-input::placeholder { color: #cbd5e1; }
+  .weight-unit { font-size: 13px; font-weight: 500; color: #94a3b8; }
+
+  .stepper-row { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 4px 0; }
+  .stepper-label { font-size: 13px; color: #334155; }
+  .stepper-controls { display: flex; align-items: center; gap: 12px; }
+  .stepper-btn { width: 32px; height: 32px; border-radius: 8px; background: #f1f5f9; color: #334155; font-size: 18px; font-weight: 500; display: flex; align-items: center; justify-content: center; flex: none; line-height: 1; }
+  .stepper-value { min-width: 24px; text-align: center; font-size: 14px; font-weight: 600; color: #0f172a; font-variant-numeric: tabular-nums; }
+
+  .preview-line { font-size: 12.5px; color: #64748b; font-variant-numeric: tabular-nums; margin-top: 8px; }
+
+  .add-btn { width: 100%; height: 44px; border-radius: 10px; background: #047857; color: #ffffff; font-size: 14.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; }
+
+  .footer {
+    flex: none;
+    background: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    padding: 12px 16px calc(12px + env(safe-area-inset-bottom));
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .footer-text { flex: 1; display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .footer-count { font-size: 14px; font-weight: 600; color: #0f172a; }
+  .footer-sub { font-size: 11.5px; color: #94a3b8; }
+  .footer-btn { height: 44px; padding: 0 18px; border-radius: 10px; background: #0f172a; color: #ffffff; font-size: 14px; font-weight: 600; display: flex; align-items: center; gap: 7px; flex: none; }
+</style>
+</helmet>
+
+<div class="app">
+  <div class="header">
+    <div class="title-row">
+      <div class="title">Fruitisimo Closing</div>
+      <div class="subtitle">{{dateLabel}}</div>
+    </div>
+    <div class="tabs">
+      <div class="tab {{dailyTabClass}}" onClick="{{selectDaily}}">Daily</div>
+      <div class="tab {{weeklyTabClass}}" onClick="{{selectWeekly}}">Weekly</div>
+    </div>
+    <div class="progress-row">
+      <div class="progress-track"><div class="progress-fill" style="{{progressFillStyle}}"></div></div>
+      <div class="progress-label">{{progressLabel}}</div>
+    </div>
+    <div class="filter-row">
+      <div class="chip {{allChipClass}}" onClick="{{selectAll}}">All<span class="count">{{totalCount}}</span></div>
+      <div class="chip {{missingChipClass}}" onClick="{{selectMissing}}">Missing<span class="count">{{missingCount}}</span></div>
+    </div>
+  </div>
+
+  <div class="body" style="{{bodyBgStyle}}">
+    <sc-for list="{{groups}}" as="grp" hint-placeholder-count="4">
+      <sc-if value="{{grp.hasVisible}}" hint-placeholder-val="{{true}}">
+        <div class="group">
+          <div class="group-head" onClick="{{grp.toggle}}">
+            <div class="group-head-left">
+              <div class="group-emoji">{{grp.emoji}}</div>
+              <div class="group-label">{{grp.label}}</div>
+            </div>
+            <div class="group-right">
+              <div class="group-count">{{grp.doneLabel}}</div>
+              <svg class="group-chevron" viewBox="0 0 24 24" fill="none" style="{{grp.chevronStyle}}">
+                <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"></path>
+              </svg>
+            </div>
+          </div>
+          <sc-if value="{{grp.expanded}}" hint-placeholder-val="{{true}}">
+          <div class="products">
+            <sc-for list="{{grp.products}}" as="p" hint-placeholder-count="6">
+              <div class="row" style="{{p.rowStyle}}">
+                <div class="row-head" onClick="{{p.toggle}}">
+                  <div class="row-name">{{p.name}}</div>
+                  <div class="row-status">
+                    <sc-if value="{{p.done}}" hint-placeholder-val="{{true}}">
+                      <div class="status-value">{{p.totalText}}</div>
+                    </sc-if>
+                    <sc-if value="{{p.missing}}" hint-placeholder-val="{{false}}">
+                      <div class="status-missing-text">Not entered</div>
+                    </sc-if>
+                    <div class="status-dot" style="{{p.dotStyle}}"></div>
+                    <svg class="chevron" viewBox="0 0 24 24" fill="none" style="{{p.chevronStyle}}">
+                      <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
+                    </svg>
+                  </div>
+                </div>
+
+                <sc-if value="{{p.hasEntries}}" hint-placeholder-val="{{false}}">
+                  <div class="entry-chips">
+                    <sc-for list="{{p.entries}}" as="e" hint-placeholder-count="2">
+                      <div class="entry-chip">
+                        <span>{{e.label}} · {{e.valueText}}</span>
+                        <div class="entry-chip-remove" onClick="{{e.remove}}">
+                          <svg width="9" height="9" viewBox="0 0 24 24" fill="none">
+                            <path d="M6 6l12 12M18 6L6 18" stroke="currentColor" stroke-width="3" stroke-linecap="round"></path>
+                          </svg>
+                        </div>
+                      </div>
+                    </sc-for>
+                  </div>
+                </sc-if>
+
+                <sc-if value="{{p.expanded}}" hint-placeholder-val="{{false}}">
+                  <div class="form">
+                    <sc-if value="{{p.isWeight}}" hint-placeholder-val="{{true}}">
+                      <div>
+                        <div class="field-label">Container</div>
+                        <div class="chip-scroll">
+                          <sc-for list="{{p.containerGroups}}" as="g" hint-placeholder-count="4">
+                            <div class="container-chip {{g.selectedClass}}" onClick="{{g.pick}}">{{g.label}}</div>
+                          </sc-for>
+                        </div>
+                        <sc-if value="{{p.hasSizeRow}}" hint-placeholder-val="{{false}}">
+                          <div class="chip-scroll size-row">
+                            <sc-for list="{{p.containerSizes}}" as="s" hint-placeholder-count="6">
+                              <div class="container-chip size {{s.selectedClass}}" onClick="{{s.pick}}">{{s.label}}</div>
+                            </sc-for>
+                          </div>
+                        </sc-if>
+                      </div>
+
+                      <sc-if value="{{p.hasVariants}}" hint-placeholder-val="{{false}}">
+                        <div>
+                          <div class="field-label">Form</div>
+                          <div class="variant-row">
+                            <sc-for list="{{p.variants}}" as="v" hint-placeholder-count="2">
+                              <div class="variant-pill {{v.selectedClass}}" onClick="{{v.pick}}">{{v.label}}</div>
+                            </sc-for>
+                          </div>
+                        </div>
+                      </sc-if>
+
+                      <div>
+                        <div class="field-label">Raw weight</div>
+                        <div class="weight-input-row">
+                          <input class="weight-input" type="number" inputmode="decimal" step="0.001" min="0" placeholder="0" value="{{p.rawValue}}" onChange="{{p.setRaw}}" />
+                          <div class="weight-unit">{{p.unitLabel}}</div>
+                        </div>
+                        <sc-if value="{{p.hasPreview}}" hint-placeholder-val="{{false}}">
+                          <div class="preview-line">{{p.previewText}}</div>
+                        </sc-if>
+                      </div>
+                    </sc-if>
+
+                    <sc-if value="{{p.isCount}}" hint-placeholder-val="{{false}}">
+                      <div>
+                        <sc-for list="{{p.packs}}" as="pk" hint-placeholder-count="2">
+                          <div class="stepper-row">
+                            <div class="stepper-label">{{pk.label}}</div>
+                            <div class="stepper-controls">
+                              <div class="stepper-btn" onClick="{{pk.dec}}">–</div>
+                              <div class="stepper-value">{{pk.count}}</div>
+                              <div class="stepper-btn" onClick="{{pk.inc}}">+</div>
+                            </div>
+                          </div>
+                        </sc-for>
+                        <div class="preview-line">{{p.previewText}}</div>
+                      </div>
+                    </sc-if>
+
+                    <div class="add-btn" style="{{p.addBtnStyle}}" onClick="{{p.addEntry}}">Add to closing</div>
+                  </div>
+                </sc-if>
+              </div>
+            </sc-for>
+          </div>
+          </sc-if>
+        </div>
+      </sc-if>
+    </sc-for>
+  </div>
+
+  <div class="footer">
+    <div class="footer-text">
+      <div class="footer-count">{{footerCount}}</div>
+      <div class="footer-sub">{{footerSub}}</div>
+    </div>
+    <div class="footer-btn">
+      Review &amp; export
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none"><path d="M9 6l6 6-6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+    </div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script>
+// Real Fruitisimo product/container config (Phase 0 data — see docs/items.md,
+// docs/containers.md, config/products.json, config/containers.json).
+// "group" matches containers.json's grouping exactly — picking a container
+// is group first, then size, so the group name is said once, not per chip.
+var CONTAINERS = [
+  { id: "none", group: "none", label: "No container", tare: 0 },
+  { id: "metal-mini", group: "Metal", label: "Mini", tare: 19 },
+  { id: "metal-small", group: "Metal", label: "Small", tare: 276 },
+  { id: "metal-medium", group: "Metal", label: "Medium", tare: 378 },
+  { id: "metal-large", group: "Metal", label: "Large", tare: 492 },
+  { id: "metal-xlarge", group: "Metal", label: "Extra large", tare: 620 },
+  { id: "metal-icecream-tray", group: "Metal", label: "Ice cream tray", tare: 750 },
+  { id: "plastic-small", group: "Plastic", label: "Small", tare: 263 },
+  { id: "plastic-large", group: "Plastic", label: "Large", tare: 393 },
+  { id: "deco-basket", group: "Deco", label: "Basket", tare: 600 }
+];
+
+// The group step's own chips — "Deco" is labeled "Basket" since it only
+// ever has the one size, so there's nothing else to call it.
+var CONTAINER_GROUPS = [
+  { id: "none", label: "None" },
+  { id: "Metal", label: "Metal" },
+  { id: "Plastic", label: "Plastic" },
+  { id: "Deco", label: "Basket" }
+];
+
+var GROUPS = [
+  { id: "fresh", label: "Fresh fruit & vegetables", unit: "kg", emoji: "🍎" },
+  { id: "frozen", label: "Frozen fruit", unit: "kg", emoji: "🧊" },
+  { id: "icecream", label: "Ice cream", unit: "g", emoji: "🍦" },
+  { id: "accessories", label: "Packaging & accessories", unit: "db", emoji: "📦" }
+];
+
+var PRODUCTS = [
+  { id: "fresh-narancs", name: "Narancs 🍊", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"], variants: [{ id: "whole", label: "Whole", multiplier: 1 }, { id: "peeled", label: "Peeled", multiplier: 1.35 }] },
+  { id: "fresh-alma", name: "Alma 🍎", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "fresh-grapefruit", name: "Grapefruit", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"], variants: [{ id: "whole", label: "Whole", multiplier: 1 }, { id: "peeled", label: "Peeled", multiplier: 1.35 }] },
+  { id: "fresh-korte", name: "Körte 🍐", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "fresh-banan", name: "Banán 🍌", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "fresh-gorogdinnye", name: "Görögdinnye 🍉", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"], variants: [{ id: "whole", label: "Whole", multiplier: 1 }, { id: "peeled", label: "Peeled", multiplier: 1.4 }] },
+  { id: "fresh-sargarepa", name: "Sárgarépa 🥕", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "fresh-cekla", name: "Cékla", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "fresh-ananasz", name: "Ananász 🍍", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "fresh-zellerszar", name: "Zellerszár", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "fresh-gyomber", name: "Gyömbér 🫚", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "fresh-menta", name: "Menta 🌿", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "fresh-citrom", name: "Citrom 🍋", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"], variants: [{ id: "whole", label: "Whole", multiplier: 1 }, { id: "peeled", label: "Peeled", multiplier: 1.35 }] },
+  { id: "fresh-spenot", name: "Spenót 🥬", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "fresh-mango", name: "Mangó 🥭", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "fresh-eper", name: "Eper 🍓", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "fresh-lime", name: "Lime", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"], variants: [{ id: "whole", label: "Whole", multiplier: 1 }, { id: "peeled", label: "Peeled", multiplier: 1.35 }] },
+  { id: "fresh-kiwi", name: "Kiwi 🥝", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "frozen-afonya", name: "Áfonya 🫐", group: "frozen", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "frozen-eper", name: "Eper 🍓", group: "frozen", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "frozen-mango", name: "Mangó 🥭", group: "frozen", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "frozen-ananasz", name: "Ananász 🍍", group: "frozen", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "frozen-malna", name: "Málna", group: "frozen", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "frozen-fekete-ribizli", name: "Fekete ribizli", group: "frozen", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "frozen-maracuja", name: "Maracuja", group: "frozen", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "frozen-gyomber", name: "Gyömbér 🫚", group: "frozen", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "frozen-avokado", name: "Avokádó 🥑", group: "frozen", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "frozen-sarkanygyumolcs", name: "Sárkánygyümölcs", group: "frozen", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "frozen-acai", name: "Acai", group: "frozen", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "icecream-vanilia", name: "Vanília", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-belga-csoki", name: "Belga csoki", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-barackos-joghurt", name: "Barackos joghurt", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-kokusz-vegan", name: "Kókusz vegan", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-turo-quella", name: "Túró-quella", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-csoki-kokusz", name: "Csoki-kókusz", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-dubai-csoki", name: "Dubai Csoki", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-mango-szorbet", name: "Mangó szorbet", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-eper-malna-szorbet", name: "Eper-málna szorbet", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-citrom-szorbet", name: "Citrom szorbet", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-gorogdinnye-fagyi", name: "Görögdinnye fagyi", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-fekete-ribizli-es-acai", name: "Fekete ribizli és acai", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-csoki-banan", name: "Csoki-banán", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-extra-pisztacia", name: "Extra pisztácia", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-sos-karamella", name: "Sós karamella", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-sarkanygyumolcs-fagyi", name: "Sárkánygyümölcs fagyi", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-italy", name: "Italy", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-torpicur", name: "Törpicur", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-cukormentes-eper-malna-szorbet", name: "Cukormentes eper-málna szorbet", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-cukormentes-mango-szorbet", name: "Cukormentes mangó szorbet", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-szezonalis-1", name: "Szezonális fagyi 1", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-szezonalis-2", name: "Szezonális fagyi 2", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-szezonalis-3", name: "Szezonális fagyi 3", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "acc-pohar-0-3", name: "Pohár 0,3", group: "accessories", kind: "count", unit: "db", tiers: ["weekly"], packs: [{ id: "karton", label: "karton", pieces: 800 }, { id: "csomag", label: "csomag", pieces: 50 }] },
+  { id: "acc-pohar-0-5", name: "Pohár 0,5", group: "accessories", kind: "count", unit: "db", tiers: ["weekly"], packs: [{ id: "karton", label: "karton", pieces: 800 }, { id: "csomag", label: "csomag", pieces: 50 }] },
+  { id: "acc-pet-flakon-0-6", name: "Pet flakon 0,6", group: "accessories", kind: "count", unit: "db", tiers: ["weekly"], packs: [{ id: "csomag", label: "csomag", pieces: 25 }] },
+  { id: "acc-pet-flakon-0-3", name: "Pet flakon 0,3", group: "accessories", kind: "count", unit: "db", tiers: ["weekly"], packs: [{ id: "csomag", label: "csomag", pieces: 25 }] },
+  { id: "acc-lyukas-poharteto", name: "Lyukas pohártető", group: "accessories", kind: "count", unit: "db", tiers: ["weekly"], packs: [{ id: "karton", label: "karton", pieces: 800 }, { id: "csomag", label: "csomag", pieces: 50 }] },
+  { id: "acc-szivoszal", name: "Szívószál", group: "accessories", kind: "count", unit: "db", tiers: ["weekly"], packs: [{ id: "karton", label: "karton", pieces: 5000 }, { id: "csomag", label: "csomag", pieces: 500 }] }
+];
+
+var CONTAINERS_BY_ID = {};
+CONTAINERS.forEach(function (c) { CONTAINERS_BY_ID[c.id] = c; });
+var PRODUCTS_BY_ID = {};
+PRODUCTS.forEach(function (p) { PRODUCTS_BY_ID[p.id] = p; });
+
+// Ice cream almost always goes in the ice cream tray, so it starts
+// pre-selected there — still changeable via the normal group/size picker.
+PRODUCTS.filter(function (p) { return p.group === "icecream"; }).forEach(function (p) {
+  p.defaultContainerId = "metal-icecream-tray";
+});
+
+// A closing already partway through, so the "missing" highlighting and the
+// multi-form breakdown are visible without having to enter data first.
+var SEED_ENTRIES = {
+  "fresh-narancs": [
+    { id: "seed-1", kind: "weight", containerId: "metal-large", variantId: "whole", raw: 3.85 },
+    { id: "seed-2", kind: "weight", containerId: "metal-medium", variantId: "peeled", raw: 2.1 }
+  ],
+  "fresh-alma": [{ id: "seed-3", kind: "weight", containerId: "plastic-large", raw: 4.2 }],
+  "fresh-banan": [{ id: "seed-4", kind: "weight", containerId: "metal-small", raw: 2.95 }],
+  "frozen-afonya": [{ id: "seed-5", kind: "weight", containerId: "plastic-large", raw: 2.6 }],
+  "frozen-eper": [{ id: "seed-6", kind: "weight", containerId: "metal-medium", raw: 1.8 }],
+  "icecream-vanilia": [{ id: "seed-7", kind: "weight", containerId: "metal-icecream-tray", raw: 1850 }],
+  "icecream-belga-csoki": [{ id: "seed-8", kind: "weight", containerId: "metal-icecream-tray", raw: 1620 }],
+  "acc-pohar-0-3": [{ id: "seed-9", kind: "count", packCounts: { karton: 2, csomag: 3 } }],
+  "acc-szivoszal": [{ id: "seed-10", kind: "count", packCounts: { karton: 1 } }]
+};
+
+function fmtUnit(n, unit) {
+  if (unit === "kg") return n.toFixed(3) + " kg";
+  if (unit === "g") return Math.round(n) + " g";
+  return Math.round(n).toLocaleString("en-US") + " db";
+}
+function fmtRaw(n, unit) {
+  if (unit === "kg") return n.toFixed(3);
+  return Math.round(n).toString();
+}
+
+class Component extends DCLogic {
+  constructor(props) {
+    super(props);
+    this.state = {
+      tier: "daily",
+      filter: "all",
+      expandedId: null,
+      entries: SEED_ENTRIES,
+      draft: { containerId: "none", variantId: null, raw: "", packCounts: {} },
+      lastContainer: {},
+      collapsedGroups: {}
+    };
+  }
+
+  setTier = (tier) => {
+    this.setState({ tier: tier, expandedId: null });
+  };
+
+  toggleGroup = (groupId) => {
+    var collapsedGroups = Object.assign({}, this.state.collapsedGroups);
+    collapsedGroups[groupId] = !collapsedGroups[groupId];
+    this.setState({ collapsedGroups: collapsedGroups });
+  };
+
+  handleToggle = (productId) => {
+    if (this.state.expandedId === productId) {
+      this.setState({ expandedId: null });
+      return;
+    }
+    var product = PRODUCTS_BY_ID[productId];
+    var startContainer = product.defaultContainerId || this.state.lastContainer[productId] || "none";
+    var startGroup = (CONTAINERS_BY_ID[startContainer] || CONTAINERS_BY_ID["none"]).group;
+    var defaultVariant = product.variants ? product.variants[0].id : null;
+    this.setState({
+      expandedId: productId,
+      draft: { containerId: startContainer, containerGroup: startGroup, variantId: defaultVariant, raw: "", packCounts: {} }
+    });
+  };
+
+  handleSelectContainerGroup = (group) => {
+    var groupContainers = CONTAINERS.filter(function (c) { return c.group === group; });
+    var containerId = groupContainers.length > 0 ? groupContainers[0].id : "none";
+    this.setState({ draft: Object.assign({}, this.state.draft, { containerGroup: group, containerId: containerId }) });
+  };
+
+  handleSelectContainer = (containerId) => {
+    this.setState({ draft: Object.assign({}, this.state.draft, { containerId: containerId }) });
+  };
+
+  handleSelectVariant = (variantId) => {
+    this.setState({ draft: Object.assign({}, this.state.draft, { variantId: variantId }) });
+  };
+
+  handleSetRaw = (e) => {
+    var val = e && typeof e === "object" && "target" in e ? e.target.value : e;
+    this.setState({ draft: Object.assign({}, this.state.draft, { raw: val }) });
+  };
+
+  handlePackDelta = (packId, delta) => {
+    var current = this.state.draft.packCounts[packId] || 0;
+    var next = Math.max(0, current + delta);
+    var packCounts = Object.assign({}, this.state.draft.packCounts);
+    packCounts[packId] = next;
+    this.setState({ draft: Object.assign({}, this.state.draft, { packCounts: packCounts }) });
+  };
+
+  handleAdd = (productId) => {
+    var product = PRODUCTS_BY_ID[productId];
+    var draft = this.state.draft;
+    var newEntry = null;
+    if (product.kind === "weight") {
+      var rawNum = parseFloat(draft.raw);
+      if (!Number.isFinite(rawNum) || rawNum <= 0) return;
+      newEntry = {
+        id: "e-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+        kind: "weight",
+        containerId: draft.containerId,
+        variantId: draft.variantId,
+        raw: rawNum
+      };
+    } else {
+      var total = (product.packs || []).reduce(function (s, pk) { return s + (draft.packCounts[pk.id] || 0); }, 0);
+      if (total <= 0) return;
+      newEntry = {
+        id: "e-" + Date.now() + "-" + Math.random().toString(36).slice(2, 7),
+        kind: "count",
+        packCounts: Object.assign({}, draft.packCounts)
+      };
+    }
+    var entries = Object.assign({}, this.state.entries);
+    entries[productId] = (entries[productId] || []).concat([newEntry]);
+    var lastContainer = Object.assign({}, this.state.lastContainer);
+    if (product.kind === "weight") lastContainer[productId] = draft.containerId;
+    this.setState({
+      entries: entries,
+      lastContainer: lastContainer,
+      draft: Object.assign({}, draft, { raw: "", packCounts: {} })
+    });
+  };
+
+  handleRemoveEntry = (productId, entryId) => {
+    var entries = Object.assign({}, this.state.entries);
+    entries[productId] = (entries[productId] || []).filter(function (e) { return e.id !== entryId; });
+    this.setState({ entries: entries });
+  };
+
+  describeEntry(product, e) {
+    if (e.kind === "weight") {
+      var container = CONTAINERS_BY_ID[e.containerId] || CONTAINERS_BY_ID["none"];
+      var tareInUnit = product.unit === "kg" ? container.tare / 1000 : container.tare;
+      var variant = product.variants ? product.variants.filter(function (v) { return v.id === e.variantId; })[0] : null;
+      var mult = variant ? variant.multiplier : 1;
+      var net = Math.max(0, e.raw - tareInUnit) * mult;
+      var label = variant ? variant.label + " · " + container.label : container.label;
+      return { label: label, valueText: fmtUnit(net, product.unit), net: net };
+    }
+    var pieces = (product.packs || []).reduce(function (sum, pk) { return sum + (e.packCounts[pk.id] || 0) * pk.pieces; }, 0);
+    var label = (product.packs || [])
+      .filter(function (pk) { return e.packCounts[pk.id]; })
+      .map(function (pk) { return e.packCounts[pk.id] + " " + pk.label; })
+      .join(" + ") || "pieces";
+    return { label: label, valueText: fmtUnit(pieces, "db"), net: pieces };
+  }
+
+  buildProductVM(product, st) {
+    var self = this;
+    var entries = st.entries[product.id] || [];
+    var done = entries.length > 0;
+    var isExpanded = st.expandedId === product.id;
+
+    var totalNet = 0;
+    var entryVMs = entries.map(function (e) {
+      var d = self.describeEntry(product, e);
+      totalNet += d.net;
+      return {
+        id: e.id,
+        label: d.label,
+        valueText: d.valueText,
+        remove: function () { self.handleRemoveEntry(product.id, e.id); }
+      };
+    });
+
+    var rowStyle = isExpanded
+      ? "border:1px solid #94a3b8;background:#ffffff;box-shadow:0 1px 3px rgba(15,23,42,0.10);"
+      : done
+      ? "border:1px solid #e2e8f0;background:#ffffff;"
+      : "border:1px solid #fde68a;background:#fffbeb;";
+    var dotStyle = done ? "background:#047857;" : "background:#d97706;";
+    var chevronStyle = isExpanded ? "transform:rotate(180deg);" : "transform:rotate(0deg);";
+
+    var vm = {
+      id: product.id,
+      name: product.name,
+      unitLabel: product.unit,
+      done: done,
+      missing: !done,
+      hasEntries: entries.length > 0,
+      entries: entryVMs,
+      totalText: done ? fmtUnit(totalNet, product.unit) : "",
+      rowStyle: rowStyle,
+      dotStyle: dotStyle,
+      chevronStyle: chevronStyle,
+      expanded: isExpanded,
+      toggle: function () { self.handleToggle(product.id); },
+      isWeight: product.kind === "weight",
+      isCount: product.kind === "count"
+    };
+
+    if (isExpanded && product.kind === "weight") {
+      var draft = st.draft;
+      vm.containerGroups = CONTAINER_GROUPS.map(function (g) {
+        return {
+          id: g.id,
+          label: g.label,
+          selectedClass: draft.containerGroup === g.id ? "selected" : "",
+          pick: function () { self.handleSelectContainerGroup(g.id); }
+        };
+      });
+      var groupContainers = CONTAINERS.filter(function (c) { return c.group === draft.containerGroup; });
+      vm.hasSizeRow = groupContainers.length > 1;
+      vm.containerSizes = groupContainers.map(function (c) {
+        return {
+          id: c.id,
+          label: c.label,
+          selectedClass: draft.containerId === c.id ? "selected" : "",
+          pick: function () { self.handleSelectContainer(c.id); }
+        };
+      });
+      vm.hasVariants = !!(product.variants && product.variants.length > 1);
+      vm.variants = (product.variants || []).map(function (v) {
+        return {
+          id: v.id,
+          label: v.label,
+          selectedClass: draft.variantId === v.id ? "selected" : "",
+          pick: function () { self.handleSelectVariant(v.id); }
+        };
+      });
+      vm.rawValue = draft.raw;
+      vm.setRaw = function (e) { self.handleSetRaw(e); };
+
+      var rawNum = parseFloat(draft.raw);
+      var rawValid = Number.isFinite(rawNum) && rawNum > 0;
+      vm.hasPreview = rawValid;
+      if (rawValid) {
+        var container = CONTAINERS_BY_ID[draft.containerId] || CONTAINERS_BY_ID["none"];
+        var tareInUnit = product.unit === "kg" ? container.tare / 1000 : container.tare;
+        var variant = product.variants ? product.variants.filter(function (v) { return v.id === draft.variantId; })[0] : null;
+        var mult = variant ? variant.multiplier : 1;
+        var afterTare = Math.max(0, rawNum - tareInUnit);
+        var net = afterTare * mult;
+        vm.previewText =
+          variant && mult !== 1
+            ? fmtRaw(rawNum, product.unit) + " − " + fmtRaw(tareInUnit, product.unit) + " = " + fmtRaw(afterTare, product.unit) + ", × " + mult + " = " + fmtUnit(net, product.unit)
+            : fmtRaw(rawNum, product.unit) + " − " + fmtRaw(tareInUnit, product.unit) + " = " + fmtUnit(net, product.unit);
+      } else {
+        vm.previewText = "";
+      }
+      vm.addBtnStyle = rawValid ? "" : "opacity:.4;";
+      vm.addEntry = function () { self.handleAdd(product.id); };
+    }
+
+    if (isExpanded && product.kind === "count") {
+      var draft2 = st.draft;
+      var packs = (product.packs || []).map(function (pk) {
+        return {
+          id: pk.id,
+          label: pk.label,
+          count: draft2.packCounts[pk.id] || 0,
+          inc: function () { self.handlePackDelta(pk.id, 1); },
+          dec: function () { self.handlePackDelta(pk.id, -1); }
+        };
+      });
+      vm.packs = packs;
+      var pieces = (product.packs || []).reduce(function (sum, pk) { return sum + (draft2.packCounts[pk.id] || 0) * pk.pieces; }, 0);
+      vm.previewText = "= " + fmtUnit(pieces, "db");
+      vm.addBtnStyle = pieces > 0 ? "" : "opacity:.4;";
+      vm.addEntry = function () { self.handleAdd(product.id); };
+    }
+
+    return vm;
+  }
+
+  renderVals() {
+    var self = this;
+    var st = this.state;
+    var tierProducts = PRODUCTS.filter(function (p) { return p.tiers.indexOf(st.tier) !== -1; });
+
+    var groups = GROUPS.map(function (g) {
+      var groupProducts = tierProducts.filter(function (p) { return p.group === g.id; });
+      var totalInGroup = groupProducts.length;
+      var doneInGroup = groupProducts.filter(function (p) { return (st.entries[p.id] || []).length > 0; }).length;
+
+      if (st.filter === "missing") {
+        groupProducts = groupProducts.filter(function (p) { return (st.entries[p.id] || []).length === 0; });
+      }
+
+      var expanded = !st.collapsedGroups[g.id];
+      var products = expanded ? groupProducts.map(function (p) { return self.buildProductVM(p, st); }) : [];
+
+      return {
+        id: g.id,
+        label: g.label,
+        emoji: g.emoji,
+        hasVisible: groupProducts.length > 0,
+        doneLabel: doneInGroup + " / " + totalInGroup,
+        expanded: expanded,
+        chevronStyle: expanded ? "transform:rotate(180deg);" : "transform:rotate(0deg);",
+        toggle: function () { self.toggleGroup(g.id); },
+        products: products
+      };
+    });
+
+    var enteredCount = tierProducts.filter(function (p) { return (st.entries[p.id] || []).length > 0; }).length;
+    var totalCount = tierProducts.length;
+    var missingCount = totalCount - enteredCount;
+    var progressPct = totalCount > 0 ? Math.round((enteredCount / totalCount) * 100) : 0;
+
+    return {
+      dateLabel: "Today",
+      bodyBgStyle: st.tier === "weekly" ? "background:#f6f7fb;" : "background:#fffdf9;",
+      dailyTabClass: st.tier === "daily" ? "active" : "",
+      weeklyTabClass: st.tier === "weekly" ? "active" : "",
+      selectDaily: function () { self.setTier("daily"); },
+      selectWeekly: function () { self.setTier("weekly"); },
+      progressFillStyle: "width:" + progressPct + "%",
+      progressLabel: enteredCount + " / " + totalCount + " entered",
+      allChipClass: st.filter === "all" ? "active" : "",
+      missingChipClass: st.filter === "missing" ? "active" : "",
+      totalCount: totalCount,
+      missingCount: missingCount,
+      selectAll: function () { self.setState({ filter: "all" }); },
+      selectMissing: function () { self.setState({ filter: "missing" }); },
+      groups: groups,
+      footerCount: enteredCount + " of " + totalCount + " entered",
+      footerSub: missingCount > 0 ? missingCount + " still missing" : "Everything entered"
+    };
+  }
+}
+</script>
+</body>
+</html>

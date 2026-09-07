@@ -1,0 +1,23 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 390, "h": 844, "title": "Closing entry" },
+    { "file": "Summary.dc.html", "x": 550, "y": 0, "w": 390, "h": 844, "title": "Review & export" }
+  ],
+  "annotations": [
+    {
+      "id": "note-main",
+      "x": 0,
+      "y": -110,
+      "w": 390,
+      "text": "Closing entry — tap a product to weigh or count it. Fully interactive: try switching Daily/Weekly, tapping \"Missing\", expanding a product, picking a container, and adding an entry."
+    },
+    {
+      "id": "note-summary",
+      "x": 550,
+      "y": -110,
+      "w": 390,
+      "text": "Review & export — recap with per-form breakdown, plus a \"Not entered\" list per Phase 0's reporting answer. Static preview of the end state."
+    }
+  ],
+  "launch": { "view": "canvas" }
+}

@@ -1,0 +1,304 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; height: 100%; }
+  .app {
+    font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #ffffff;
+    color: #0f172a;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+  a { color: #047857; }
+  a:hover { color: #065f46; }
+
+  .header { flex: none; background: #ffffff; border-bottom: 1px solid #e2e8f0; padding: 14px 16px 14px; display: flex; flex-direction: column; gap: 8px; }
+  .back-row { display: flex; align-items: center; gap: 5px; font-size: 12.5px; font-weight: 500; color: #64748b; }
+  .title-row { display: flex; align-items: baseline; justify-content: space-between; }
+  .title { font-size: 17px; font-weight: 600; color: #0f172a; letter-spacing: -0.01em; }
+  .subtitle { font-size: 12px; color: #94a3b8; }
+  .stat-row { display: flex; gap: 10px; margin-top: 2px; }
+  .stat { flex: 1; border: 1px solid #e2e8f0; border-radius: 10px; padding: 8px 10px; }
+  .stat-value { font-size: 16px; font-weight: 700; color: #0f172a; font-variant-numeric: tabular-nums; }
+  .stat-label { font-size: 10.5px; color: #94a3b8; margin-top: 1px; }
+  .stat.warn { border-color: #fde68a; background: #fffbeb; }
+  .stat.warn .stat-value { color: #b45309; }
+
+  .body { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 14px 16px 24px; display: flex; flex-direction: column; gap: 20px; }
+
+  .section-label { font-size: 13px; font-weight: 600; color: #475569; padding: 0 2px; margin-bottom: 8px; }
+
+  .group { display: flex; flex-direction: column; gap: 8px; }
+  .group-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 11px 13px; background: #f1f5f9; border-radius: 11px; }
+  .group-head-left { display: flex; align-items: center; gap: 9px; min-width: 0; }
+  .group-emoji { font-size: 17px; line-height: 1; flex: none; }
+  .group-label { font-size: 15px; font-weight: 700; color: #1e293b; }
+  .group-unit { font-size: 12px; font-weight: 600; color: #64748b; }
+
+  .item-row { border: 1px solid #e2e8f0; border-radius: 12px; padding: 11px 14px; }
+  .item-top { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .item-name { font-size: 14px; font-weight: 500; color: #0f172a; }
+  .item-total { font-size: 14px; font-weight: 700; color: #0f172a; font-variant-numeric: tabular-nums; }
+  .item-breakdown { font-size: 12px; color: #64748b; margin-top: 4px; font-variant-numeric: tabular-nums; }
+
+  .missing-wrap { display: flex; flex-wrap: wrap; gap: 6px; }
+  .missing-chip { padding: 6px 10px; border-radius: 8px; font-size: 12px; font-weight: 500; color: #b45309; background: #fffbeb; border: 1px solid #fde68a; }
+
+  .footer { flex: none; background: #ffffff; border-top: 1px solid #e2e8f0; padding: 12px 16px calc(12px + env(safe-area-inset-bottom)); display: flex; flex-direction: column; gap: 8px; }
+  .footer-note { font-size: 11.5px; color: #94a3b8; text-align: center; }
+  .export-btn { width: 100%; height: 46px; border-radius: 10px; background: #0f172a; color: #ffffff; font-size: 14.5px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 8px; }
+</style>
+</helmet>
+
+<div class="app">
+  <div class="header">
+    <div class="back-row">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none"><path d="M15 6l-6 6 6 6" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      Back to entry
+    </div>
+    <div class="title-row">
+      <div class="title">Weekly closing</div>
+      <div class="subtitle">{{dateLabel}}</div>
+    </div>
+    <div class="stat-row">
+      <div class="stat">
+        <div class="stat-value">{{enteredCount}}</div>
+        <div class="stat-label">entered</div>
+      </div>
+      <div class="stat warn">
+        <div class="stat-value">{{missingCount}}</div>
+        <div class="stat-label">not entered</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="body">
+    <div>
+      <div class="section-label">Summary</div>
+      <div class="group" style="gap:16px;">
+        <sc-for list="{{enteredGroups}}" as="grp" hint-placeholder-count="4">
+          <sc-if value="{{grp.hasItems}}" hint-placeholder-val="{{true}}">
+            <div class="group">
+              <div class="group-head">
+                <div class="group-head-left">
+                  <div class="group-emoji">{{grp.emoji}}</div>
+                  <div class="group-label">{{grp.label}}</div>
+                </div>
+                <div class="group-unit">{{grp.unit}}</div>
+              </div>
+              <div class="group" style="gap:8px;">
+                <sc-for list="{{grp.items}}" as="it" hint-placeholder-count="4">
+                  <div class="item-row">
+                    <div class="item-top">
+                      <div class="item-name">{{it.name}}</div>
+                      <div class="item-total">{{it.totalText}}</div>
+                    </div>
+                    <sc-if value="{{it.hasBreakdown}}" hint-placeholder-val="{{false}}">
+                      <div class="item-breakdown">{{it.breakdownText}}</div>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+        </sc-for>
+      </div>
+    </div>
+
+    <div>
+      <div class="section-label">Not entered ({{missingCount}})</div>
+      <div class="missing-wrap">
+        <sc-for list="{{missingItems}}" as="m" hint-placeholder-count="8">
+          <div class="missing-chip">{{m.name}}</div>
+        </sc-for>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="export-btn">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M12 3v12m0 0l-4-4m4 4l4-4M5 21h14" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+      Export .xlsx
+    </div>
+    <div class="footer-note">Missing items still export — this is a snapshot, not a gate.</div>
+  </div>
+</div>
+</x-dc>
+<script data-dc-script>
+// Same real Fruitisimo config and seed entries as Main.dc.html — kept in
+// sync by hand for this design pass (artboards don't share runtime state).
+var GROUPS = [
+  { id: "fresh", label: "Fresh fruit & vegetables", unit: "kg", emoji: "🍎" },
+  { id: "frozen", label: "Frozen fruit", unit: "kg", emoji: "🧊" },
+  { id: "icecream", label: "Ice cream", unit: "g", emoji: "🍦" },
+  { id: "accessories", label: "Packaging & accessories", unit: "db", emoji: "📦" }
+];
+
+var PRODUCTS = [
+  { id: "fresh-narancs", name: "Narancs 🍊", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"], variants: [{ id: "whole", label: "Whole", multiplier: 1 }, { id: "peeled", label: "Peeled", multiplier: 1.35 }] },
+  { id: "fresh-alma", name: "Alma 🍎", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "fresh-grapefruit", name: "Grapefruit", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"], variants: [{ id: "whole", label: "Whole", multiplier: 1 }, { id: "peeled", label: "Peeled", multiplier: 1.35 }] },
+  { id: "fresh-korte", name: "Körte 🍐", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "fresh-banan", name: "Banán 🍌", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "fresh-gorogdinnye", name: "Görögdinnye 🍉", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"], variants: [{ id: "whole", label: "Whole", multiplier: 1 }, { id: "peeled", label: "Peeled", multiplier: 1.4 }] },
+  { id: "fresh-sargarepa", name: "Sárgarépa 🥕", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "fresh-cekla", name: "Cékla", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "fresh-ananasz", name: "Ananász 🍍", group: "fresh", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "fresh-zellerszar", name: "Zellerszár", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "fresh-gyomber", name: "Gyömbér 🫚", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "fresh-menta", name: "Menta 🌿", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "fresh-citrom", name: "Citrom 🍋", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"], variants: [{ id: "whole", label: "Whole", multiplier: 1 }, { id: "peeled", label: "Peeled", multiplier: 1.35 }] },
+  { id: "fresh-spenot", name: "Spenót 🥬", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "fresh-mango", name: "Mangó 🥭", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "fresh-eper", name: "Eper 🍓", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "fresh-lime", name: "Lime", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"], variants: [{ id: "whole", label: "Whole", multiplier: 1 }, { id: "peeled", label: "Peeled", multiplier: 1.35 }] },
+  { id: "fresh-kiwi", name: "Kiwi 🥝", group: "fresh", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "frozen-afonya", name: "Áfonya 🫐", group: "frozen", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "frozen-eper", name: "Eper 🍓", group: "frozen", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "frozen-mango", name: "Mangó 🥭", group: "frozen", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "frozen-ananasz", name: "Ananász 🍍", group: "frozen", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "frozen-malna", name: "Málna", group: "frozen", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "frozen-fekete-ribizli", name: "Fekete ribizli", group: "frozen", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "frozen-maracuja", name: "Maracuja", group: "frozen", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "frozen-gyomber", name: "Gyömbér 🫚", group: "frozen", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "frozen-avokado", name: "Avokádó 🥑", group: "frozen", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "frozen-sarkanygyumolcs", name: "Sárkánygyümölcs", group: "frozen", kind: "weight", unit: "kg", tiers: ["daily", "weekly"] },
+  { id: "frozen-acai", name: "Acai", group: "frozen", kind: "weight", unit: "kg", tiers: ["weekly"] },
+  { id: "icecream-vanilia", name: "Vanília", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-belga-csoki", name: "Belga csoki", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-barackos-joghurt", name: "Barackos joghurt", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-kokusz-vegan", name: "Kókusz vegan", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-turo-quella", name: "Túró-quella", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-csoki-kokusz", name: "Csoki-kókusz", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-dubai-csoki", name: "Dubai Csoki", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-mango-szorbet", name: "Mangó szorbet", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-eper-malna-szorbet", name: "Eper-málna szorbet", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-citrom-szorbet", name: "Citrom szorbet", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-gorogdinnye-fagyi", name: "Görögdinnye fagyi", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-fekete-ribizli-es-acai", name: "Fekete ribizli és acai", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-csoki-banan", name: "Csoki-banán", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-extra-pisztacia", name: "Extra pisztácia", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-sos-karamella", name: "Sós karamella", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-sarkanygyumolcs-fagyi", name: "Sárkánygyümölcs fagyi", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-italy", name: "Italy", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-torpicur", name: "Törpicur", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-cukormentes-eper-malna-szorbet", name: "Cukormentes eper-málna szorbet", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-cukormentes-mango-szorbet", name: "Cukormentes mangó szorbet", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-szezonalis-1", name: "Szezonális fagyi 1", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-szezonalis-2", name: "Szezonális fagyi 2", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "icecream-szezonalis-3", name: "Szezonális fagyi 3", group: "icecream", kind: "weight", unit: "g", tiers: ["daily", "weekly"] },
+  { id: "acc-pohar-0-3", name: "Pohár 0,3", group: "accessories", kind: "count", unit: "db", tiers: ["weekly"], packs: [{ id: "karton", label: "karton", pieces: 800 }, { id: "csomag", label: "csomag", pieces: 50 }] },
+  { id: "acc-pohar-0-5", name: "Pohár 0,5", group: "accessories", kind: "count", unit: "db", tiers: ["weekly"], packs: [{ id: "karton", label: "karton", pieces: 800 }, { id: "csomag", label: "csomag", pieces: 50 }] },
+  { id: "acc-pet-flakon-0-6", name: "Pet flakon 0,6", group: "accessories", kind: "count", unit: "db", tiers: ["weekly"], packs: [{ id: "csomag", label: "csomag", pieces: 25 }] },
+  { id: "acc-pet-flakon-0-3", name: "Pet flakon 0,3", group: "accessories", kind: "count", unit: "db", tiers: ["weekly"], packs: [{ id: "csomag", label: "csomag", pieces: 25 }] },
+  { id: "acc-lyukas-poharteto", name: "Lyukas pohártető", group: "accessories", kind: "count", unit: "db", tiers: ["weekly"], packs: [{ id: "karton", label: "karton", pieces: 800 }, { id: "csomag", label: "csomag", pieces: 50 }] },
+  { id: "acc-szivoszal", name: "Szívószál", group: "accessories", kind: "count", unit: "db", tiers: ["weekly"], packs: [{ id: "karton", label: "karton", pieces: 5000 }, { id: "csomag", label: "csomag", pieces: 500 }] }
+];
+
+var CONTAINERS = [
+  { id: "none", label: "No container", tare: 0 },
+  { id: "metal-mini", label: "Metal · Mini", tare: 19 },
+  { id: "metal-small", label: "Metal · Small", tare: 276 },
+  { id: "metal-medium", label: "Metal · Medium", tare: 378 },
+  { id: "metal-large", label: "Metal · Large", tare: 492 },
+  { id: "metal-xlarge", label: "Metal · XL", tare: 620 },
+  { id: "metal-icecream-tray", label: "Metal · Ice cream tray", tare: 750 },
+  { id: "plastic-small", label: "Plastic · Small", tare: 263 },
+  { id: "plastic-large", label: "Plastic · Large", tare: 393 },
+  { id: "deco-basket", label: "Deco · Basket", tare: 600 }
+];
+var CONTAINERS_BY_ID = {};
+CONTAINERS.forEach(function (c) { CONTAINERS_BY_ID[c.id] = c; });
+
+var SEED_ENTRIES = {
+  "fresh-narancs": [
+    { id: "seed-1", kind: "weight", containerId: "metal-large", variantId: "whole", raw: 3.85 },
+    { id: "seed-2", kind: "weight", containerId: "metal-medium", variantId: "peeled", raw: 2.1 }
+  ],
+  "fresh-alma": [{ id: "seed-3", kind: "weight", containerId: "plastic-large", raw: 4.2 }],
+  "fresh-banan": [{ id: "seed-4", kind: "weight", containerId: "metal-small", raw: 2.95 }],
+  "frozen-afonya": [{ id: "seed-5", kind: "weight", containerId: "plastic-large", raw: 2.6 }],
+  "frozen-eper": [{ id: "seed-6", kind: "weight", containerId: "metal-medium", raw: 1.8 }],
+  "icecream-vanilia": [{ id: "seed-7", kind: "weight", containerId: "metal-icecream-tray", raw: 1850 }],
+  "icecream-belga-csoki": [{ id: "seed-8", kind: "weight", containerId: "metal-icecream-tray", raw: 1620 }],
+  "acc-pohar-0-3": [{ id: "seed-9", kind: "count", packCounts: { karton: 2, csomag: 3 } }],
+  "acc-szivoszal": [{ id: "seed-10", kind: "count", packCounts: { karton: 1 } }]
+};
+
+function fmtUnit(n, unit) {
+  if (unit === "kg") return n.toFixed(3) + " kg";
+  if (unit === "g") return Math.round(n) + " g";
+  return Math.round(n).toLocaleString("en-US") + " db";
+}
+
+function describeEntry(product, e) {
+  if (e.kind === "weight") {
+    var container = CONTAINERS_BY_ID[e.containerId] || CONTAINERS_BY_ID["none"];
+    var tareInUnit = product.unit === "kg" ? container.tare / 1000 : container.tare;
+    var variant = product.variants ? product.variants.filter(function (v) { return v.id === e.variantId; })[0] : null;
+    var mult = variant ? variant.multiplier : 1;
+    var net = Math.max(0, e.raw - tareInUnit) * mult;
+    var label = variant ? variant.label + " " + fmtUnit(net, product.unit) : fmtUnit(net, product.unit);
+    return { label: label, net: net };
+  }
+  var pieces = (product.packs || []).reduce(function (sum, pk) { return sum + (e.packCounts[pk.id] || 0) * pk.pieces; }, 0);
+  var label = (product.packs || [])
+    .filter(function (pk) { return e.packCounts[pk.id]; })
+    .map(function (pk) { return e.packCounts[pk.id] + " " + pk.label; })
+    .join(" + ");
+  return { label: label + " (" + fmtUnit(pieces, "db") + ")", net: pieces };
+}
+
+class Component extends DCLogic {
+  renderVals() {
+    var tier = "weekly";
+    var tierProducts = PRODUCTS.filter(function (p) { return p.tiers.indexOf(tier) !== -1; });
+
+    var enteredGroups = GROUPS.map(function (g) {
+      var groupProducts = tierProducts.filter(function (p) { return p.group === g.id && (SEED_ENTRIES[p.id] || []).length > 0; });
+      var items = groupProducts.map(function (p) {
+        var entries = SEED_ENTRIES[p.id] || [];
+        var total = 0;
+        var parts = entries.map(function (e) {
+          var d = describeEntry(p, e);
+          total += d.net;
+          return d.label;
+        });
+        return {
+          name: p.name,
+          totalText: fmtUnit(total, p.unit),
+          hasBreakdown: entries.length > 1,
+          breakdownText: parts.join(" + ")
+        };
+      });
+      return { id: g.id, label: g.label, emoji: g.emoji, unit: g.unit, hasItems: items.length > 0, items: items };
+    });
+
+    var missingItems = tierProducts
+      .filter(function (p) { return (SEED_ENTRIES[p.id] || []).length === 0; })
+      .map(function (p) { return { name: p.name }; });
+
+    var enteredCount = tierProducts.filter(function (p) { return (SEED_ENTRIES[p.id] || []).length > 0; }).length;
+
+    return {
+      dateLabel: "Today",
+      enteredCount: enteredCount,
+      missingCount: tierProducts.length - enteredCount,
+      enteredGroups: enteredGroups,
+      missingItems: missingItems
+    };
+  }
+}
+</script>
+</body>
+</html>
