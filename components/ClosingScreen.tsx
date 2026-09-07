@@ -1,10 +1,22 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 
 import ProductRow from "@/components/ProductRow";
 import type { AppConfig, ClosingTier } from "@/lib/config";
 import type { Entry } from "@/lib/entries";
+import {
+  parseSession,
+  serialiseSession,
+  today,
+  type StoredSession,
+} from "@/lib/session";
+import {
+  getServerSnapshot,
+  getSnapshot,
+  subscribe,
+  write,
+} from "@/lib/session-store";
 
 const TIERS: { id: ClosingTier; label: string }[] = [
   { id: "daily", label: "Daily" },
@@ -25,8 +37,12 @@ const GROUP_EMOJI: Record<string, string> = {
   kave: "☕",
 };
 
-function todayLabel(): string {
-  return new Date().toLocaleDateString("en-GB", {
+/** Stable reference, so an empty closing doesn't invalidate memos each render. */
+const NO_ENTRIES: Entry[] = [];
+
+function dateLabel(isoDay: string): string {
+  const [year, month, day] = isoDay.split("-").map(Number);
+  return new Date(year!, month! - 1, day!).toLocaleDateString("en-GB", {
     day: "numeric",
     month: "short",
     year: "numeric",
@@ -34,14 +50,64 @@ function todayLabel(): string {
 }
 
 export default function ClosingScreen({ config }: { config: AppConfig }) {
-  const [tier, setTier] = useState<ClosingTier>("daily");
+  const [fallbackTier, setFallbackTier] = useState<ClosingTier>("daily");
   const [filter, setFilter] = useState<"all" | "missing">("all");
   const [collapsed, setCollapsed] = useState<Record<string, boolean>>({});
   const [expandedId, setExpandedId] = useState<string | null>(null);
-  const [entries, setEntries] = useState<Entry[]>([]);
+  const [confirmingReset, setConfirmingReset] = useState(false);
+
+  // The saved closing IS the state: read straight from localStorage during
+  // render, so a refresh mid-closing restores itself with no copying step.
+  const raw = useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot);
+  const knownIds = useMemo(
+    () => new Set(config.products.map((p) => p.id)),
+    [config.products],
+  );
+  const restored = useMemo(
+    () => parseSession(raw, knownIds),
+    [raw, knownIds],
+  );
+
+  const entries = restored?.session.entries ?? NO_ENTRIES;
+  const startedAt = restored?.session.startedAt ?? today();
+  const dropped = restored?.dropped ?? 0;
+  const tier = restored?.session.tier ?? fallbackTier;
+
+  function save(next: Partial<StoredSession>) {
+    write(
+      serialiseSession({
+        version: 1,
+        tier,
+        startedAt,
+        entries,
+        ...next,
+      }),
+    );
+  }
+
+  function setTier(next: ClosingTier) {
+    setFallbackTier(next);
+    if (restored) save({ tier: next });
+  }
+
+  function addEntry(entry: Entry) {
+    save({ entries: [...entries, entry] });
+  }
+
+  function removeEntry(entryId: string) {
+    save({ entries: entries.filter((e) => e.id !== entryId) });
+  }
+
+  function startNewClosing() {
+    write(null);
+    setExpandedId(null);
+    setConfirmingReset(false);
+  }
+
+  const isStale = entries.length > 0 && startedAt !== today();
 
   // How many entries each product has, for the progress bar and the Missing
-  // filter. Step 6 persists `entries` to localStorage.
+  // filter.
   const entryCounts = useMemo(() => {
     const counts: Record<string, number> = {};
     for (const entry of entries) {
@@ -78,7 +144,7 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
           <h1 className="text-[17px] font-semibold tracking-tight">
             Fruitisimo Closing
           </h1>
-          <span className="text-xs text-slate-400">{todayLabel()}</span>
+          <span className="text-xs text-slate-400">{dateLabel(startedAt)}</span>
         </div>
 
         <div role="tablist" className="flex gap-1 rounded-[10px] bg-slate-100 p-[3px]">
@@ -137,6 +203,29 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
         </div>
       </header>
 
+      {isStale && (
+        <div className="flex flex-none items-center justify-between gap-3 border-b border-amber-200 bg-amber-50 px-4 py-2.5">
+          <p className="text-[13px] text-amber-900">
+            This closing was started on {dateLabel(startedAt)}.
+          </p>
+          <button
+            type="button"
+            onClick={startNewClosing}
+            className="flex-none rounded-lg bg-amber-900 px-3 py-1.5 text-xs font-semibold text-white"
+          >
+            Start new
+          </button>
+        </div>
+      )}
+
+      {dropped > 0 && (
+        <p className="flex-none border-b border-slate-200 bg-slate-50 px-4 py-2 text-[13px] text-slate-600">
+          {dropped} saved {dropped === 1 ? "entry" : "entries"} referred to
+          products that are no longer in the list, and {dropped === 1 ? "was" : "were"}{" "}
+          dropped.
+        </p>
+      )}
+
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 pt-3.5 pb-6">
         {groups.map((group) => {
           const isCollapsed = collapsed[group.id] ?? false;
@@ -181,10 +270,8 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
                           id === product.id ? null : product.id,
                         )
                       }
-                      onAdd={(entry) => setEntries((all) => [...all, entry])}
-                      onRemove={(entryId) =>
-                        setEntries((all) => all.filter((e) => e.id !== entryId))
-                      }
+                      onAdd={addEntry}
+                      onRemove={removeEntry}
                     />
                   ))}
                   {group.products.length === 0 && (
@@ -197,6 +284,42 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
             </section>
           );
         })}
+
+        <div className="pt-2">
+          {confirmingReset ? (
+            <div className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-3.5 py-3">
+              <span className="text-[13px] text-red-900">
+                Delete all {entries.length}{" "}
+                {entries.length === 1 ? "entry" : "entries"}?
+              </span>
+              <span className="flex flex-none gap-2">
+                <button
+                  type="button"
+                  onClick={() => setConfirmingReset(false)}
+                  className="rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-600"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={startNewClosing}
+                  className="rounded-lg bg-red-700 px-3 py-1.5 text-xs font-semibold text-white"
+                >
+                  Delete
+                </button>
+              </span>
+            </div>
+          ) : (
+            <button
+              type="button"
+              onClick={() => setConfirmingReset(true)}
+              disabled={entries.length === 0}
+              className="w-full rounded-xl border border-slate-200 py-3 text-[13px] font-medium text-slate-500 disabled:opacity-50"
+            >
+              Start new closing
+            </button>
+          )}
+        </div>
       </div>
     </div>
   );

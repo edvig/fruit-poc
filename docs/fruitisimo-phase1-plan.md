@@ -156,6 +156,28 @@ screen.
   never forgets on its own.
 - **Done when:** mid-closing, a refresh (or closing and reopening the browser
   tab) restores exactly where you left off.
+- **Status:** done. localStorage is wired as a React external store
+  (`lib/session-store.ts` + `useSyncExternalStore`), so the saved closing is
+  read during render rather than copied into state by an effect — no
+  first-render flash of an empty closing, and no risk of the empty initial
+  state overwriting saved work. `lib/session.ts` holds the pure parse/
+  serialise half.
+- Three cases that would otherwise bite in the shop:
+  - **A closing left over from another day** is restored but flagged with a
+    banner naming its date and a "Start new" button, rather than silently
+    presenting yesterday's numbers as today's. It is not auto-discarded
+    either, since a closing can legitimately cross midnight.
+  - **Safari private mode / full quota** throws on write; the store falls back
+    to memory so the closing keeps working for the session instead of dropping
+    every entry.
+  - **Entries whose product left the config** (config changes between
+    deploys) are dropped on load and reported, rather than becoming invisible
+    but still counted.
+- "Start new closing" asks before deleting, and sits at the end of the list,
+  away from the taps staff make constantly.
+- Verified by component tests that mount, enter a weight, throw the component
+  away and mount again — the entries, the totals and the selected closing type
+  all come back. 69 tests pass.
 
 ## Step 7 — Entries list & summary
 **Goal:** see and correct what's been entered, and see the running totals.
