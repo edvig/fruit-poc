@@ -220,3 +220,29 @@ describe("removing an entry", () => {
     expect(screen.getAllByRole("button", { name: /^Remove / })).toHaveLength(2);
   });
 });
+
+describe("telling entered products apart at a glance", () => {
+  it("marks a product with entries as entered", () => {
+    setup("fresh-alma", [
+      {
+        id: "a",
+        kind: "weight",
+        productId: "fresh-alma",
+        raw: 2,
+        containerId: "none",
+        netGrams: 2000,
+      },
+    ]);
+    // The entry chips are list items too; the product row is the outer one.
+    const row = screen.getAllByRole("listitem")[0]!;
+    expect(row.getAttribute("data-state")).toBe("entered");
+    expect(row.className).toContain("bg-emerald-50");
+  });
+
+  it("leaves an untouched product plain", () => {
+    setup("fresh-alma");
+    const row = screen.getAllByRole("listitem")[0]!;
+    expect(row.getAttribute("data-state")).toBe("empty");
+    expect(row.className).not.toContain("emerald");
+  });
+});

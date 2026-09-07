@@ -49,9 +49,17 @@ export default function ProductRow({
 }) {
   const mine = entriesFor(product.id, entries);
   const total = productTotal(product, entries);
+  const entered = mine.length > 0;
 
   return (
-    <li className="rounded-xl border border-slate-200">
+    <li
+      // data-state is the semantic hook: the tint is only its presentation,
+      // and a third state ("Done") is parked in Phase 3 of the app plan.
+      data-state={entered ? "entered" : "empty"}
+      className={`rounded-xl border ${
+        entered ? "border-emerald-200 bg-emerald-50/60" : "border-slate-200"
+      }`}
+    >
       <button
         type="button"
         onClick={onToggle}
