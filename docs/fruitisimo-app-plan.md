@@ -114,6 +114,20 @@ Fruitisimo data — replace the calculator + mental math, nothing else yet.
 
 - Admin screens to add/edit products, containers, tare weights, multipliers.
 - Search/favorites for the product list if it's long.
+- **A third product state — "Done".** Today a product is either _not entered_
+  or _entered_, which conflates "one tray is on the scale" with "this one is
+  finished". A product measured in several forms sits in between, and with
+  38-132 products in a closing, "what is genuinely left?" is the question the
+  screen should answer. Shape: a tick/toggle on the row marks it Done, which
+  closes the entry form so nothing can be added by accident; sliding it back
+  returns it to _entered_ and re-opens the form, deleting nothing. Progress
+  would then count Done rather than merely entered, and the filter chips
+  become All / Missing / Done. **The cost is taps** — an explicit tick is one
+  extra tap per product (132 on a monthly closing) for products that usually
+  have exactly one entry, so it's worth deciding between an explicit tick, an
+  auto-Done on first entry that staff slide back, or a "mark everything
+  entered as Done" sweep at the end. Deliberately parked out of Phase 1 to
+  keep the POC simple.
 - Mobile polish: bigger touch targets, clear error states, resilience to a
   brief network hiccup mid-entry.
 - Real acceptance test: have staff do a live closing in the app.
@@ -212,5 +226,5 @@ Phase 1 is broken into steps in `fruitisimo-phase1-plan.md`; Step 1
 (scaffolding), Step 2 (real config), Step 3 (the calculation engine, with
 tests), Step 4 (closing-type switcher and product list), Step 5 (the entry
 flow) and Step 6 (localStorage persistence) are built and verified locally,
-with the first Vercel deploy still to happen. Step 7 (entries list and summary)
-is next.
+with the first Vercel deploy still to happen. Step 7 (entries list and
+summary) is next.
