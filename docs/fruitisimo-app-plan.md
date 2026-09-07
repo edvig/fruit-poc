@@ -168,20 +168,35 @@ Four open points settled before Phase 1 Step 1 starts:
    (`items.md` / the xlsx), since those are what staff read off the sheet and
    what gets hand-copied into the Czech system.
 
-### Known data cleanups for the config step
+### Data cleanups — resolved in Step 2
 
-- Names drift between the daily and monthly sheets: "Vegán kókusz" vs
-  "Kókusz vegan", "Barackos joghurt fagyi" vs "Barackos joghurt". Pick one
-  display name per product, keyed by a stable id.
-- Four names collide across fresh and frozen (eper, mangó, ananász, gyömbér)
-  — they are separate report lines and need distinct ids.
-- "Szezonális fagyi" ×3 and "Fagyasztott szezonális" ×2 are blank slots in the
-  real sheet; treat them as user-nameable entries rather than fixed products.
-- Units differ by category (fruit kg, ice cream g, accessories db) while every
-  tare in `containers.md` is grams — the calculation engine should work in a
-  single internal unit and format per category on output.
+- **Name drift** between the daily and monthly sheets: resolved in `items.md`,
+  which now carries one canonical name per product (the monthly spellings —
+  "Barackos joghurt", "Kókusz vegan", "Cukormentes … szorbet"). The config
+  follows `items.md`.
+- **Name collisions** across fresh and frozen (eper, mangó, ananász, gyömbér):
+  distinct ids (`fresh-eper` / `frozen-eper`), separate report lines.
+- **"Szezonális fagyi" ×3**: three `seasonal: true` slots, to be named by staff
+  at entry rather than fixed products.
+- **Units** differ by category (fruit kg, ice cream g, accessories db) while
+  every tare is grams. Config records the display unit per product; Step 3's
+  engine does the conversion, working in one internal unit.
 
-**Where we are:** Phase 0 is done (see `fruitisimo-phase0-discovery.md`), and
-Phase 1 is broken into steps in `fruitisimo-phase1-plan.md`. Step 1
-(scaffolding + deploy) has not been started; the code in the repo today is the
-retired pre-Phase-0 POC.
+- **Pack sizes: use the monthly sheet's figures.** Where the two sheets
+  disagree, monthly isn't a contradiction — it just lists an extra option the
+  daily/weekly sheet omits. So `Lyukas pohártető` is 800/karton + 50/csomag,
+  and `Szívószál` is 5000/karton + 500/csomag. **karton = box, csomag = pack,
+  and a karton is always the bigger of the two** — the config validator now
+  enforces that packs are ordered largest first, so a future entry can't
+  silently invert them.
+
+### Still open
+
+- **"No container".** The config offers a zero-tare option for anything
+  weighed straight on the scale. Confirm that actually happens.
+
+**Where we are:** Phase 0 is done (see `fruitisimo-phase0-discovery.md`).
+Phase 1 is broken into steps in `fruitisimo-phase1-plan.md`; Step 1
+(scaffolding) and Step 2 (real config over `GET /api/config`) are built and
+verified locally, with the first Vercel deploy still to happen. Step 3 (the
+calculation engine) is next.

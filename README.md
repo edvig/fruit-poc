@@ -43,7 +43,17 @@ config needed. Every push to `main` redeploys.
 Pages are served static from the CDN and only `app/api/*` runs as serverless
 functions, so there's no idle cold start.
 
+## Config
+
+`config/products.json` and `config/containers.json` hold Fruitisimo's real
+products, tare weights, peeled-fruit multipliers, and accessory pack sizes,
+transcribed from `docs/`. Edit those files to change the app's data — no code
+change needed. `lib/config.ts` types and validates them — duplicate ids, unknown groups,
+multipliers below 1, pack sizes out of order and similar all throw, which
+**fails the build**, so a bad edit can't reach production. `GET /api/config`
+serves them to the client.
+
 ## Status
 
-Phase 1, Step 1 (scaffolding + deploy pipeline) — the app is an empty skeleton
-with a health check. Real config, calculation, and entry flows come next.
+Phase 1, Step 2 done: real config served over the API. Calculation engine,
+entry flow, and xlsx export come next.

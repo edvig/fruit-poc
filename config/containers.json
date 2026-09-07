@@ -1,0 +1,65 @@
+{
+  "$comment": "Generated from docs/containers.md. Tare weights are in grams. 'none' is an app-side addition for anything weighed straight on the scale - confirm with staff that this happens.",
+  "containers": [
+    {
+      "id": "none",
+      "name": "No container",
+      "group": "none",
+      "tare": 0
+    },
+    {
+      "id": "metal-mini",
+      "name": "Mini",
+      "group": "Metal",
+      "tare": 19
+    },
+    {
+      "id": "metal-small",
+      "name": "Small",
+      "group": "Metal",
+      "tare": 276
+    },
+    {
+      "id": "metal-medium",
+      "name": "Medium",
+      "group": "Metal",
+      "tare": 378
+    },
+    {
+      "id": "metal-large",
+      "name": "Large",
+      "group": "Metal",
+      "tare": 492
+    },
+    {
+      "id": "metal-xlarge",
+      "name": "Extra large",
+      "group": "Metal",
+      "tare": 620
+    },
+    {
+      "id": "metal-icecream-tray",
+      "name": "Ice cream tray",
+      "group": "Metal",
+      "tare": 750
+    },
+    {
+      "id": "plastic-small",
+      "name": "Small",
+      "group": "Plastic",
+      "tare": 263
+    },
+    {
+      "id": "plastic-large",
+      "name": "Large",
+      "group": "Plastic",
+      "tare": 393
+    },
+    {
+      "id": "deco-basket",
+      "name": "Basket",
+      "group": "Deco",
+      "tare": 600
+    }
+  ]
+}

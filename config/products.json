@@ -1,0 +1,770 @@
+{
+  "$comment": "Generated from docs/items.md and the 'Napi leltár' sheet of docs/inventory.xlsx. Daily + weekly only; monthly is pending the open questions at the end of items.md. Order within each group follows the sheet's own row order. Pack sizes use the monthly sheet's fuller figures, which list a csomag option the daily/weekly sheet omits.",
+  "groups": [
+    {
+      "id": "fresh",
+      "label": "Fresh fruit & vegetables",
+      "unit": "kg"
+    },
+    {
+      "id": "frozen",
+      "label": "Frozen fruit",
+      "unit": "kg"
+    },
+    {
+      "id": "icecream",
+      "label": "Ice cream",
+      "unit": "g"
+    },
+    {
+      "id": "accessories",
+      "label": "Packaging & accessories",
+      "unit": "db"
+    }
+  ],
+  "products": [
+    {
+      "id": "fresh-narancs",
+      "name": "Narancs",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ],
+      "variants": [
+        {
+          "id": "whole",
+          "label": "Whole",
+          "multiplier": 1
+        },
+        {
+          "id": "peeled",
+          "label": "Peeled",
+          "multiplier": 1.35
+        }
+      ]
+    },
+    {
+      "id": "fresh-alma",
+      "name": "Alma",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "fresh-grapefruit",
+      "name": "Grapefruit",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ],
+      "variants": [
+        {
+          "id": "whole",
+          "label": "Whole",
+          "multiplier": 1
+        },
+        {
+          "id": "peeled",
+          "label": "Peeled",
+          "multiplier": 1.35
+        }
+      ]
+    },
+    {
+      "id": "fresh-korte",
+      "name": "Körte",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "fresh-banan",
+      "name": "Banán",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "fresh-gorogdinnye",
+      "name": "Görögdinnye",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ],
+      "variants": [
+        {
+          "id": "whole",
+          "label": "Whole",
+          "multiplier": 1
+        },
+        {
+          "id": "peeled",
+          "label": "Peeled",
+          "multiplier": 1.4
+        }
+      ]
+    },
+    {
+      "id": "fresh-sargarepa",
+      "name": "Sárgarépa",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "fresh-cekla",
+      "name": "Cékla",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "weekly"
+      ]
+    },
+    {
+      "id": "fresh-ananasz",
+      "name": "Ananász",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "fresh-zellerszar",
+      "name": "Zellerszár",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "weekly"
+      ]
+    },
+    {
+      "id": "fresh-gyomber",
+      "name": "Gyömbér",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "weekly"
+      ]
+    },
+    {
+      "id": "fresh-menta",
+      "name": "Menta",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "weekly"
+      ]
+    },
+    {
+      "id": "fresh-citrom",
+      "name": "Citrom",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "weekly"
+      ],
+      "variants": [
+        {
+          "id": "whole",
+          "label": "Whole",
+          "multiplier": 1
+        },
+        {
+          "id": "peeled",
+          "label": "Peeled",
+          "multiplier": 1.35
+        }
+      ]
+    },
+    {
+      "id": "fresh-spenot",
+      "name": "Spenót",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "weekly"
+      ]
+    },
+    {
+      "id": "fresh-mango",
+      "name": "Mangó",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "weekly"
+      ]
+    },
+    {
+      "id": "fresh-eper",
+      "name": "Eper",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "weekly"
+      ]
+    },
+    {
+      "id": "fresh-lime",
+      "name": "Lime",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "weekly"
+      ],
+      "variants": [
+        {
+          "id": "whole",
+          "label": "Whole",
+          "multiplier": 1
+        },
+        {
+          "id": "peeled",
+          "label": "Peeled",
+          "multiplier": 1.35
+        }
+      ]
+    },
+    {
+      "id": "fresh-kiwi",
+      "name": "Kiwi",
+      "group": "fresh",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "weekly"
+      ]
+    },
+    {
+      "id": "frozen-afonya",
+      "name": "Áfonya",
+      "group": "frozen",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "frozen-eper",
+      "name": "Eper",
+      "group": "frozen",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "frozen-mango",
+      "name": "Mangó",
+      "group": "frozen",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "frozen-ananasz",
+      "name": "Ananász",
+      "group": "frozen",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "frozen-malna",
+      "name": "Málna",
+      "group": "frozen",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "weekly"
+      ]
+    },
+    {
+      "id": "frozen-fekete-ribizli",
+      "name": "Fekete ribizli",
+      "group": "frozen",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "weekly"
+      ]
+    },
+    {
+      "id": "frozen-maracuja",
+      "name": "Maracuja",
+      "group": "frozen",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "weekly"
+      ]
+    },
+    {
+      "id": "frozen-gyomber",
+      "name": "Gyömbér",
+      "group": "frozen",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "frozen-avokado",
+      "name": "Avokádó",
+      "group": "frozen",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "frozen-sarkanygyumolcs",
+      "name": "Sárkánygyümölcs",
+      "group": "frozen",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "frozen-acai",
+      "name": "Acai",
+      "group": "frozen",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-vanilia",
+      "name": "Vanília",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-belga-csoki",
+      "name": "Belga csoki",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-barackos-joghurt",
+      "name": "Barackos joghurt",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-kokusz-vegan",
+      "name": "Kókusz vegan",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-turo-quella",
+      "name": "Túró-quella",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-csoki-kokusz",
+      "name": "Csoki-kókusz",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-dubai-csoki",
+      "name": "Dubai Csoki",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-mango-szorbet",
+      "name": "Mangó szorbet",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-eper-malna-szorbet",
+      "name": "Eper-málna szorbet",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-citrom-szorbet",
+      "name": "Citrom szorbet",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-gorogdinnye-fagyi",
+      "name": "Görögdinnye fagyi",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-fekete-ribizli-es-acai",
+      "name": "Fekete ribizli és acai",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-csoki-banan",
+      "name": "Csoki-banán",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-extra-pisztacia",
+      "name": "Extra pisztácia",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-sos-karamella",
+      "name": "Sós karamella",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-sarkanygyumolcs-fagyi",
+      "name": "Sárkánygyümölcs fagyi",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-italy",
+      "name": "Italy",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-torpicur",
+      "name": "Törpicur",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-cukormentes-eper-malna-szorbet",
+      "name": "Cukormentes eper-málna szorbet",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-cukormentes-mango-szorbet",
+      "name": "Cukormentes mangó szorbet",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ]
+    },
+    {
+      "id": "icecream-szezonalis-1",
+      "name": "Szezonális fagyi 1",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ],
+      "seasonal": true
+    },
+    {
+      "id": "icecream-szezonalis-2",
+      "name": "Szezonális fagyi 2",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ],
+      "seasonal": true
+    },
+    {
+      "id": "icecream-szezonalis-3",
+      "name": "Szezonális fagyi 3",
+      "group": "icecream",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "daily",
+        "weekly"
+      ],
+      "seasonal": true
+    },
+    {
+      "id": "acc-pohar-0-3",
+      "name": "Pohár 0,3",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "weekly"
+      ],
+      "packs": [
+        {
+          "id": "karton",
+          "label": "karton",
+          "pieces": 800
+        },
+        {
+          "id": "csomag",
+          "label": "csomag",
+          "pieces": 50
+        }
+      ]
+    },
+    {
+      "id": "acc-pohar-0-5",
+      "name": "Pohár 0,5",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "weekly"
+      ],
+      "packs": [
+        {
+          "id": "karton",
+          "label": "karton",
+          "pieces": 800
+        },
+        {
+          "id": "csomag",
+          "label": "csomag",
+          "pieces": 50
+        }
+      ]
+    },
+    {
+      "id": "acc-pet-flakon-0-6",
+      "name": "Pet flakon 0,6",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "weekly"
+      ],
+      "packs": [
+        {
+          "id": "csomag",
+          "label": "csomag",
+          "pieces": 25
+        }
+      ]
+    },
+    {
+      "id": "acc-pet-flakon-0-3",
+      "name": "Pet flakon 0,3",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "weekly"
+      ],
+      "packs": [
+        {
+          "id": "csomag",
+          "label": "csomag",
+          "pieces": 25
+        }
+      ]
+    },
+    {
+      "id": "acc-lyukas-poharteto",
+      "name": "Lyukas pohártető",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "weekly"
+      ],
+      "packs": [
+        {
+          "id": "karton",
+          "label": "karton",
+          "pieces": 800
+        },
+        {
+          "id": "csomag",
+          "label": "csomag",
+          "pieces": 50
+        }
+      ]
+    },
+    {
+      "id": "acc-szivoszal",
+      "name": "Szívószál",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "weekly"
+      ],
+      "packs": [
+        {
+          "id": "karton",
+          "label": "karton",
+          "pieces": 5000
+        },
+        {
+          "id": "csomag",
+          "label": "csomag",
+          "pieces": 500
+        }
+      ]
+    }
+  ]
+}

@@ -30,6 +30,8 @@ after Step 8.
   responds.
 - **Done when:** the Vercel URL loads on both a PC browser and a phone
   browser, and shows the health check succeeded.
+- **Status:** built and verified locally (build, lint, typecheck, and the
+  running server all pass). Awaiting the first push + Vercel import.
 
 ## Step 2 — Real config data
 **Goal:** turn `items.md` / `containers.md` into structured data the app can
@@ -39,8 +41,10 @@ actually read, with a schema that has room for everything Phase 0 found
   (`weight` | `count`), which closing tiers it belongs to (daily/weekly/
   monthly), and variants if any (e.g. peeled, with its multiplier).
 - `config/containers.json` — id, display name, tare weight.
-- Counted products carry their pack sizes (pieces per `csomag`, per `karton`)
-  so the entry flow can do carton/pack → piece math.
+- Counted products carry their pack sizes (pieces per `karton` = box, per
+  `csomag` = pack, largest first) so the entry flow can do box/pack → piece
+  math. Where the daily/weekly and monthly sheets differ, the monthly figures
+  win — they list the extra option rather than contradicting.
 - Scope for now: **daily + weekly** (one sheet; weekly-only items are the
   differently coloured cells). Monthly is deferred until the open questions at
   the end of `items.md` are answered, but the config schema keeps a tier field
@@ -52,6 +56,12 @@ actually read, with a schema that has room for everything Phase 0 found
 - **Done when:** hitting `/api/config` returns the full real product and
   container list for daily + weekly, matching `items.md`, `containers.md`,
   and the `Napi leltár` sheet of `inventory.xlsx`.
+- **Status:** done. `config/products.json` (58 products: 18 fresh, 11 frozen,
+  23 ice cream, 6 accessories — 38 of them daily) and
+  `config/containers.json` (9 real containers + a "No container" option) are
+  served by `GET /api/config`, loaded through `lib/config.ts`. Output was
+  diffed programmatically against `items.md` and `containers.md`, category by
+  category, and matches on every one.
 
 ## Step 3 — Calculation engine (no UI yet)
 **Goal:** get the actual math right and provable, independent of any screen.
