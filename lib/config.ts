@@ -2,8 +2,8 @@ import containersJson from "@/config/containers.json";
 import productsJson from "@/config/products.json";
 
 export const CLOSING_TIERS = ["daily", "weekly", "monthly"] as const;
-export const UNITS = ["kg", "g", "db"] as const;
-export const PRODUCT_KINDS = ["weight", "count"] as const;
+export const UNITS = ["kg", "g", "db", "l"] as const;
+export const PRODUCT_KINDS = ["weight", "count", "amount"] as const;
 
 export type ClosingTier = (typeof CLOSING_TIERS)[number];
 export type Unit = (typeof UNITS)[number];
@@ -29,11 +29,22 @@ export interface Product {
   /** Hungarian, exactly as Fruitisimo writes it on the sheet. */
   name: string;
   group: string;
+  /**
+   * `weight` goes on the scale (container tare, optional multiplier), `count`
+   * is pieces (optionally boxes/packs), `amount` is a quantity read straight
+   * off the stock and typed in - the monthly sheet's litres, which no scale
+   * and no piece count produces.
+   */
   kind: ProductKind;
   unit: Unit;
   tiers: ClosingTier[];
   variants?: Variant[];
   packs?: Pack[];
+  /**
+   * Container id pre-selected when this product is weighed. Overrides the
+   * group's default; staff can still pick another one.
+   */
+  defaultContainer?: string;
   /** A blank "Szezonális" row on the sheet — staff name it when entering. */
   seasonal?: boolean;
 }
@@ -42,6 +53,11 @@ export interface ProductGroup {
   id: string;
   label: string;
   unit: Unit;
+  /**
+   * Container pre-selected for every weighed product in the group - ice cream
+   * always goes in the ice cream tray, so that group sets it once here.
+   */
+  defaultContainer?: string;
 }
 
 export interface Container {
@@ -63,9 +79,21 @@ function validate(config: AppConfig): void {
   const groupIds = new Set(config.groups.map((g) => g.id));
   const seen = new Set<string>();
 
+  const containerIds = new Set<string>();
+  for (const c of config.containers) {
+    if (containerIds.has(c.id)) problems.push(`duplicate container id "${c.id}"`);
+    containerIds.add(c.id);
+    if (!(c.tare >= 0)) problems.push(`${c.id}: tare ${c.tare} is negative`);
+  }
+
   for (const group of config.groups) {
     if (!UNITS.includes(group.unit)) {
       problems.push(`group ${group.id}: unknown unit "${group.unit}"`);
+    }
+    if (group.defaultContainer && !containerIds.has(group.defaultContainer)) {
+      problems.push(
+        `group ${group.id}: unknown default container "${group.defaultContainer}"`,
+      );
     }
   }
 
@@ -114,19 +142,31 @@ function validate(config: AppConfig): void {
       previous = pack.pieces;
     }
 
-    if (p.kind === "count" && p.variants) {
-      problems.push(`${p.id}: counted products cannot have weight variants`);
+    if (p.kind !== "weight" && p.variants) {
+      problems.push(`${p.id}: only weighed products can have variants`);
     }
-    if (p.kind === "weight" && p.packs) {
-      problems.push(`${p.id}: weighed products cannot have packs`);
+    if (p.kind !== "count" && p.packs) {
+      problems.push(`${p.id}: only counted products can have packs`);
     }
-  }
-
-  const containerIds = new Set<string>();
-  for (const c of config.containers) {
-    if (containerIds.has(c.id)) problems.push(`duplicate container id "${c.id}"`);
-    containerIds.add(c.id);
-    if (!(c.tare >= 0)) problems.push(`${c.id}: tare ${c.tare} is negative`);
+    // The scale reads grams, so a weighed product has to report in a weight
+    // unit; pieces are always "db". `amount` is deliberately unconstrained -
+    // it is whatever the sheet writes in that row.
+    if (p.kind === "weight" && p.unit !== "kg" && p.unit !== "g") {
+      problems.push(`${p.id}: weighed products must be kg or g, not "${p.unit}"`);
+    }
+    if (p.kind === "count" && p.unit !== "db") {
+      problems.push(`${p.id}: counted products must be db, not "${p.unit}"`);
+    }
+    if (p.defaultContainer && !containerIds.has(p.defaultContainer)) {
+      problems.push(
+        `${p.id}: unknown default container "${p.defaultContainer}"`,
+      );
+    }
+    // Only weighed products go on the scale, so a tare is meaningless anywhere
+    // else.
+    if (p.kind !== "weight" && p.defaultContainer) {
+      problems.push(`${p.id}: only weighed products can have a default container`);
+    }
   }
 
   if (problems.length > 0) {
@@ -152,4 +192,16 @@ export function getConfig(): AppConfig {
 
 export function productsForTier(tier: ClosingTier): Product[] {
   return config.products.filter((p) => p.tiers.includes(tier));
+}
+
+/**
+ * The container to pre-select for a weighed product: its own default, else its
+ * group's, else none - staff pick from the full list either way.
+ */
+export function defaultContainerFor(product: Product): Container | undefined {
+  if (product.kind !== "weight") return undefined;
+  const id =
+    product.defaultContainer ??
+    config.groups.find((g) => g.id === product.group)?.defaultContainer;
+  return id ? config.containers.find((c) => c.id === id) : undefined;
 }

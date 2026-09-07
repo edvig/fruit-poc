@@ -153,11 +153,10 @@ Four open points settled before Phase 1 Step 1 starts:
    DECOS/packaging, KÁVÉ, sugar, and cleaning supplies — all counted (`db`) —
    plus frozen fruit tracked per package size (`Fagyasztott áfonya 2,5kg`
    etc.), which pairs with the workbook's separate "opened packages" sheet.
-   **Deferred, though:** Phase 1 builds **daily + weekly first** — they share
-   one sheet, with weekly-only items marked by cell colour. `items.md` now
-   documents the monthly categories too, but it ends with a list of open
-   questions (missing products, per-sheet name drift, unit oddities) that need
-   answering before monthly can be built.
+   **Built:** the open questions at the end of `items.md` were answered, so
+   monthly is now in the config alongside daily + weekly — 132 products, every
+   daily/weekly item plus VITRIN, SZELETEK, the rest of DECOS, EGYÉB and
+   KÁVÉ.
 3. **Counted items are entered as cartons + packs + pieces**, auto-multiplied
    into one piece total using the pack sizes written into the sheet's own
    labels (e.g. `Pohár 0,3 — 800/karton, 50/csomag`). This removes mental math
@@ -181,6 +180,10 @@ Four open points settled before Phase 1 Step 1 starts:
 - **Units** differ by category (fruit kg, ice cream g, accessories db) while
   every tare is grams. Config records the display unit per product; Step 3's
   engine does the conversion, working in one internal unit.
+- **Litres on the monthly sheet** (milk, coconut drink, agave syrup) are
+  neither a scale reading nor a piece count, so they got a third product kind:
+  `amount` — a quantity typed straight in, no container and no pack math. The
+  engine refuses to convert `l` to grams rather than assuming a density.
 
 - **Pack sizes: use the monthly sheet's figures.** Where the two sheets
   disagree, monthly isn't a contradiction — it just lists an extra option the
@@ -194,9 +197,19 @@ Four open points settled before Phase 1 Step 1 starts:
 
 - **"No container".** The config offers a zero-tare option for anything
   weighed straight on the scale. Confirm that actually happens.
+- **Two monthly rows are marked kg although they look like piece goods**
+  (`Katicabogár` 340/doboz, `Vakond lefolyó tisztító`). Configured as weighed,
+  per the sheet, pending a check with staff.
+- **How the monthly `amount` (litre) rows are actually taken** — counted
+  cartons, or an estimate of what's left. Affects nothing in the config, but
+  decides what the entry screen should ask for.
+- **Default containers.** Ice cream defaults to the ice cream tray (750g).
+  Whether any fresh or frozen fruit has a standard tray is unconfirmed, so
+  they have none.
 
 **Where we are:** Phase 0 is done (see `fruitisimo-phase0-discovery.md`).
 Phase 1 is broken into steps in `fruitisimo-phase1-plan.md`; Step 1
-(scaffolding) and Step 2 (real config over `GET /api/config`) are built and
-verified locally, with the first Vercel deploy still to happen. Step 3 (the
-calculation engine) is next.
+(scaffolding), Step 2 (real config over `GET /api/config`) and Step 3 (the
+calculation engine, with tests) are built and verified locally, with the first
+Vercel deploy still to happen. Step 4 (closing-type and product selection UI)
+is next.

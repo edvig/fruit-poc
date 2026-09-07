@@ -33,6 +33,7 @@ the API halves are talking to each other.
 npm run build      # production build
 npm start          # serve the production build
 npm run typecheck  # tsc --noEmit
+npm test           # vitest: the closing math in lib/calc.test.ts
 ```
 
 ## Deploy (Vercel, free tier)
@@ -53,7 +54,15 @@ multipliers below 1, pack sizes out of order and similar all throw, which
 **fails the build**, so a bad edit can't reach production. `GET /api/config`
 serves them to the client.
 
+## The math
+
+`lib/calc.ts` is the closing arithmetic, deliberately free of any UI: tare
+comes off first, the peeled-fruit multiplier after (`net = (raw - tare) *
+multiplier`), everything computed in grams and rounded to the nearest gram.
+`lib/calc.test.ts` pins it to hand-checked examples taken from the real
+config — run `npm test`.
+
 ## Status
 
-Phase 1, Step 2 done: real config served over the API. Calculation engine,
-entry flow, and xlsx export come next.
+Phase 1, Steps 1-3 done: scaffolding, real config over the API, and the
+tested calculation engine. Entry flow and xlsx export come next.

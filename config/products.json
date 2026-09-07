@@ -1,5 +1,5 @@
 {
-  "$comment": "Generated from docs/items.md and the 'Napi leltár' sheet of docs/inventory.xlsx. Daily + weekly only; monthly is pending the open questions at the end of items.md. Order within each group follows the sheet's own row order. Pack sizes use the monthly sheet's fuller figures, which list a csomag option the daily/weekly sheet omits.",
+  "$comment": "Generated from docs/items.md and docs/inventory.xlsx ('Napi leltar' sheet for daily/weekly, 'Havi Leltar' for monthly). Order within each group follows the sheet's own row order. Monthly is a superset of weekly, so every daily/weekly product also carries the monthly tier. Pack sizes use the monthly sheet's fuller figures, which list a csomag option the daily/weekly sheet omits. 'defaultContainer' pre-selects a container id from containers.json - set it on a group to cover every weighed product in it, or on a single product to override the group.",
   "groups": [
     {
       "id": "fresh",
@@ -14,12 +14,33 @@
     {
       "id": "icecream",
       "label": "Ice cream",
-      "unit": "g"
+      "unit": "g",
+      "defaultContainer": "metal-icecream-tray"
     },
     {
       "id": "accessories",
-      "label": "Packaging & accessories",
+      "label": "Packaging & cleaning (DECOS)",
       "unit": "db"
+    },
+    {
+      "id": "vitrin",
+      "label": "Display case (Vitrin)",
+      "unit": "db"
+    },
+    {
+      "id": "szeletek",
+      "label": "Bars (Szeletek)",
+      "unit": "db"
+    },
+    {
+      "id": "egyeb",
+      "label": "Other stock (Egyéb)",
+      "unit": "db"
+    },
+    {
+      "id": "kave",
+      "label": "Coffee & sugar (Kávé)",
+      "unit": "kg"
     }
   ],
   "products": [
@@ -31,7 +52,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "variants": [
         {
@@ -54,7 +76,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -65,7 +88,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "variants": [
         {
@@ -88,7 +112,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -99,7 +124,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -110,7 +136,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "variants": [
         {
@@ -133,7 +160,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -143,7 +171,8 @@
       "kind": "weight",
       "unit": "kg",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -154,7 +183,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -164,7 +194,8 @@
       "kind": "weight",
       "unit": "kg",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -174,7 +205,8 @@
       "kind": "weight",
       "unit": "kg",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -184,7 +216,8 @@
       "kind": "weight",
       "unit": "kg",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -194,7 +227,8 @@
       "kind": "weight",
       "unit": "kg",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "variants": [
         {
@@ -216,7 +250,8 @@
       "kind": "weight",
       "unit": "kg",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -226,7 +261,8 @@
       "kind": "weight",
       "unit": "kg",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -236,7 +272,8 @@
       "kind": "weight",
       "unit": "kg",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -246,7 +283,8 @@
       "kind": "weight",
       "unit": "kg",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "variants": [
         {
@@ -268,7 +306,8 @@
       "kind": "weight",
       "unit": "kg",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -279,7 +318,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -290,7 +330,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -301,7 +342,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -312,7 +354,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -322,7 +365,8 @@
       "kind": "weight",
       "unit": "kg",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -332,7 +376,8 @@
       "kind": "weight",
       "unit": "kg",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -342,7 +387,8 @@
       "kind": "weight",
       "unit": "kg",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -353,7 +399,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -364,7 +411,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -375,7 +423,8 @@
       "unit": "kg",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -385,8 +434,31 @@
       "kind": "weight",
       "unit": "kg",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ]
+    },
+    {
+      "id": "frozen-szezonalis-1",
+      "name": "Fagyasztott szezonális 1",
+      "group": "frozen",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
+      ],
+      "seasonal": true
+    },
+    {
+      "id": "frozen-szezonalis-2",
+      "name": "Fagyasztott szezonális 2",
+      "group": "frozen",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
+      ],
+      "seasonal": true
     },
     {
       "id": "icecream-vanilia",
@@ -396,7 +468,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -407,7 +480,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -418,7 +492,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -429,7 +504,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -440,7 +516,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -451,7 +528,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -462,7 +540,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -473,7 +552,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -484,7 +564,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -495,7 +576,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -506,7 +588,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -517,7 +600,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -528,7 +612,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -539,7 +624,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -550,7 +636,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -561,7 +648,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -572,7 +660,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -583,7 +672,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -594,7 +684,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -605,7 +696,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ]
     },
     {
@@ -616,7 +708,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "seasonal": true
     },
@@ -628,7 +721,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "seasonal": true
     },
@@ -640,7 +734,8 @@
       "unit": "g",
       "tiers": [
         "daily",
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "seasonal": true
     },
@@ -651,7 +746,8 @@
       "kind": "count",
       "unit": "db",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "packs": [
         {
@@ -673,7 +769,8 @@
       "kind": "count",
       "unit": "db",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "packs": [
         {
@@ -695,7 +792,8 @@
       "kind": "count",
       "unit": "db",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "packs": [
         {
@@ -712,7 +810,8 @@
       "kind": "count",
       "unit": "db",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "packs": [
         {
@@ -729,7 +828,8 @@
       "kind": "count",
       "unit": "db",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "packs": [
         {
@@ -751,7 +851,8 @@
       "kind": "count",
       "unit": "db",
       "tiers": [
-        "weekly"
+        "weekly",
+        "monthly"
       ],
       "packs": [
         {
@@ -764,6 +865,864 @@
           "label": "csomag",
           "pieces": 500
         }
+      ]
+    },
+    {
+      "id": "acc-szalveta",
+      "name": "Szalvéta",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "doboz",
+          "label": "doboz",
+          "pieces": 2000
+        }
+      ]
+    },
+    {
+      "id": "acc-nem-lyukas-poharteto",
+      "name": "Nem lyukas pohártető",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "karton",
+          "label": "karton",
+          "pieces": 800
+        },
+        {
+          "id": "csomag",
+          "label": "csomag",
+          "pieces": 50
+        }
+      ]
+    },
+    {
+      "id": "acc-fresh-pohar",
+      "name": "Fresh pohár",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "acc-fresh-teto",
+      "name": "Fresh tető",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "acc-penztargepszalag",
+      "name": "Pénztárgépszalag",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "csomag",
+          "label": "csomag",
+          "pieces": 5
+        }
+      ]
+    },
+    {
+      "id": "acc-bambusz-fagyispohar",
+      "name": "Bambusz fagyispohár",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "karton",
+          "label": "karton",
+          "pieces": 800
+        }
+      ]
+    },
+    {
+      "id": "acc-termopohar",
+      "name": "Termopohár",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "csomag",
+          "label": "csomag",
+          "pieces": 100
+        }
+      ]
+    },
+    {
+      "id": "acc-termopohar-teto",
+      "name": "Termopohár tető",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "csomag",
+          "label": "csomag",
+          "pieces": 100
+        }
+      ]
+    },
+    {
+      "id": "acc-fagyis-kanal",
+      "name": "Fagyis kanál",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "csomag",
+          "label": "csomag",
+          "pieces": 600
+        }
+      ]
+    },
+    {
+      "id": "acc-konyhai-torlokendo",
+      "name": "Konyhai törlőkendő",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "csomag",
+          "label": "csomag",
+          "pieces": 12
+        }
+      ]
+    },
+    {
+      "id": "acc-szivacsos-torlokendo",
+      "name": "Szivacsos törlőkendő",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "csomag",
+          "label": "csomag",
+          "pieces": 5
+        }
+      ]
+    },
+    {
+      "id": "acc-mososzivacs",
+      "name": "Mosószivacs",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "csomag",
+          "label": "csomag",
+          "pieces": 10
+        }
+      ]
+    },
+    {
+      "id": "acc-stop-bakterie",
+      "name": "STOP Bakterie",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "acc-jar-5l-zold",
+      "name": "JAR 5l zöld",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "acc-alfik",
+      "name": "Alfik",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "acc-pytel-szemeteszsak",
+      "name": "Pytel nagy szemeteszsák",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "roll",
+          "label": "roll",
+          "pieces": 25
+        }
+      ]
+    },
+    {
+      "id": "acc-vinil-kesztyu",
+      "name": "Vinil kesztyű",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "doboz",
+          "label": "doboz",
+          "pieces": 100
+        }
+      ]
+    },
+    {
+      "id": "acc-citroclean",
+      "name": "Citroclean",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "acc-szemeteszsak",
+      "name": "Szemeteszsák",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "acc-nylon-zacsko",
+      "name": "Nylon zacskó",
+      "group": "accessories",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "roll",
+          "label": "roll",
+          "pieces": 250
+        }
+      ]
+    },
+    {
+      "id": "acc-vakond-lefolyo-tisztito",
+      "name": "Vakond lefolyó tisztító",
+      "group": "accessories",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "vitrin-cake-cup-pisztacias-malnas",
+      "name": "Cake cup pisztáciás-málnás",
+      "group": "vitrin",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "vitrin-cake-cup-kokuszos-csoki",
+      "name": "Cake cup kókuszos-csoki",
+      "group": "vitrin",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "vitrin-cake-cup-sargarepatorta",
+      "name": "Cake cup sárgarépatorta",
+      "group": "vitrin",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "vitrin-snack-bowl-avokado-banan-turo",
+      "name": "Snack bowl Avokádó-banán-túró",
+      "group": "vitrin",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "vitrin-snack-bowl-mango-kokusz-turo",
+      "name": "Snack bowl Mangó-kókusz-túró",
+      "group": "vitrin",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "vitrin-snack-bowl-green-power",
+      "name": "Snack bowl Green power",
+      "group": "vitrin",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "vitrin-snack-bowl-acai-raspberry",
+      "name": "Snack bowl Acai Raspberry",
+      "group": "vitrin",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "vitrin-snack-bowl-eper-protein",
+      "name": "Snack bowl Eper protein",
+      "group": "vitrin",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "vitrin-muffin-afonyas",
+      "name": "Muffin áfonyás",
+      "group": "vitrin",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "vitrin-muffin-fahejas-citrommazzal",
+      "name": "Muffin – Fahéjas citrommázzal",
+      "group": "vitrin",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "vitrin-viz",
+      "name": "Víz",
+      "group": "vitrin",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "vitrin-kokuszviz",
+      "name": "Kókuszvíz",
+      "group": "vitrin",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "vitrin-the-good-brownie",
+      "name": "The Good Brownie",
+      "group": "vitrin",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "vitrin-rich-banana-bread",
+      "name": "Rich Banana Bread",
+      "group": "vitrin",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "szelet-oat-berries",
+      "name": "Oat Berries",
+      "group": "szeletek",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "szelet-oat-coconut",
+      "name": "Oat Coconut",
+      "group": "szeletek",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "szelet-raw-booster-mango",
+      "name": "Raw Booster Mango",
+      "group": "szeletek",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "szelet-kick-me-up-raspberry",
+      "name": "Kick Me Up Raspberry",
+      "group": "szeletek",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-kis-edes-tolcser",
+      "name": "Kis édes tölcsér",
+      "group": "egyeb",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "doboz",
+          "label": "doboz",
+          "pieces": 360
+        }
+      ]
+    },
+    {
+      "id": "egyeb-kis-csokis-tolcser",
+      "name": "Kis csokis tölcsér",
+      "group": "egyeb",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "doboz",
+          "label": "doboz",
+          "pieces": 180
+        }
+      ]
+    },
+    {
+      "id": "egyeb-nagy-tolcser",
+      "name": "Nagy tölcsér",
+      "group": "egyeb",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "doboz",
+          "label": "doboz",
+          "pieces": 225
+        }
+      ]
+    },
+    {
+      "id": "egyeb-grand-standard-tolcser",
+      "name": "Grand standard sima tölcsér",
+      "group": "egyeb",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "doboz",
+          "label": "doboz",
+          "pieces": 600
+        }
+      ]
+    },
+    {
+      "id": "egyeb-csokis-racs",
+      "name": "Csokis rács",
+      "group": "egyeb",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-csoki-rud-feher",
+      "name": "Csoki rúd fehér",
+      "group": "egyeb",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "doboz",
+          "label": "doboz",
+          "pieces": 120
+        }
+      ]
+    },
+    {
+      "id": "egyeb-csoki-rud-barna",
+      "name": "Csoki rúd barna",
+      "group": "egyeb",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ],
+      "packs": [
+        {
+          "id": "doboz",
+          "label": "doboz",
+          "pieces": 120
+        }
+      ]
+    },
+    {
+      "id": "egyeb-katicabogar",
+      "name": "Katicabogár",
+      "group": "egyeb",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-cukorszoras",
+      "name": "Cukorszórás",
+      "group": "egyeb",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-roletti",
+      "name": "Roletti",
+      "group": "egyeb",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-szines-roletti",
+      "name": "Színes roletti",
+      "group": "egyeb",
+      "kind": "count",
+      "unit": "db",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-orias-roletti",
+      "name": "Óriás roletti",
+      "group": "egyeb",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-feherje",
+      "name": "Fehérje 1kg",
+      "group": "egyeb",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-nadcukor",
+      "name": "Nádcukor",
+      "group": "egyeb",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-chiamag",
+      "name": "Chiamag 0,5kg",
+      "group": "egyeb",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-spirulina",
+      "name": "Spirulina 100g",
+      "group": "egyeb",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-matcha",
+      "name": "Matcha 100g",
+      "group": "egyeb",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-eperpor",
+      "name": "Eperpor 250g",
+      "group": "egyeb",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-mez",
+      "name": "Méz",
+      "group": "egyeb",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-kokusz-tej",
+      "name": "Kókusz tej (sűrű)",
+      "group": "egyeb",
+      "kind": "amount",
+      "unit": "l",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-kokusz-ital",
+      "name": "Kókusz ital (Valsoia / Metro)",
+      "group": "egyeb",
+      "kind": "amount",
+      "unit": "l",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-tej",
+      "name": "Tej",
+      "group": "egyeb",
+      "kind": "amount",
+      "unit": "l",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-laktozmentes-tej",
+      "name": "Laktózmentes tej",
+      "group": "egyeb",
+      "kind": "amount",
+      "unit": "l",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-joghurt",
+      "name": "Joghurt",
+      "group": "egyeb",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-muzli",
+      "name": "Műzli 750g",
+      "group": "egyeb",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-zabpehely",
+      "name": "Zabpehely 500g",
+      "group": "egyeb",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-mogyorovaj",
+      "name": "Mogyoróvaj 250g",
+      "group": "egyeb",
+      "kind": "weight",
+      "unit": "g",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "egyeb-agave-szirup",
+      "name": "Agave szirup 250ml",
+      "group": "egyeb",
+      "kind": "amount",
+      "unit": "l",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "kave-1000g",
+      "name": "Kávé 1000g",
+      "group": "kave",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "kave-500g",
+      "name": "Kávé 500g",
+      "group": "kave",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "kave-250g",
+      "name": "Kávé 250g",
+      "group": "kave",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "kave-sima-cukor",
+      "name": "Sima cukor",
+      "group": "kave",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
+      ]
+    },
+    {
+      "id": "kave-barna-cukor",
+      "name": "Barna cukor",
+      "group": "kave",
+      "kind": "weight",
+      "unit": "kg",
+      "tiers": [
+        "monthly"
       ]
     }
   ]

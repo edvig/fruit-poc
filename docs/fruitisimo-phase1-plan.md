@@ -45,23 +45,28 @@ actually read, with a schema that has room for everything Phase 0 found
   `csomag` = pack, largest first) so the entry flow can do box/pack → piece
   math. Where the daily/weekly and monthly sheets differ, the monthly figures
   win — they list the extra option rather than contradicting.
-- Scope for now: **daily + weekly** (one sheet; weekly-only items are the
-  differently coloured cells). Monthly is deferred until the open questions at
-  the end of `items.md` are answered, but the config schema keeps a tier field
-  so monthly slots in without rework.
+- All three tiers: **daily + weekly** come from the `Napi leltár` sheet
+  (weekly-only items are the differently coloured cells), **monthly** from
+  `Havi Leltár`. Monthly is a superset — every daily/weekly product carries the
+  monthly tier too, and monthly adds VITRIN, SZELETEK, the rest of DECOS,
+  EGYÉB and KÁVÉ.
 - Resolve the known data cleanups listed in `fruitisimo-app-plan.md`: name
   drift between sheets, the four fresh/frozen name collisions, the seasonal
   blank slots, and per-category units (kg / g / db) vs. gram tares.
 - `GET /api/config` returns both, merged, for the client to consume.
 - **Done when:** hitting `/api/config` returns the full real product and
-  container list for daily + weekly, matching `items.md`, `containers.md`,
-  and the `Napi leltár` sheet of `inventory.xlsx`.
-- **Status:** done. `config/products.json` (58 products: 18 fresh, 11 frozen,
-  23 ice cream, 6 accessories — 38 of them daily) and
-  `config/containers.json` (9 real containers + a "No container" option) are
-  served by `GET /api/config`, loaded through `lib/config.ts`. Output was
-  diffed programmatically against `items.md` and `containers.md`, category by
-  category, and matches on every one.
+  container list for all three tiers, matching `items.md`, `containers.md`,
+  and both sheets of `inventory.xlsx`.
+- **Status:** done. `config/products.json` (132 products: 18 fresh, 13 frozen,
+  23 ice cream, 27 DECOS, 14 vitrin, 4 szeletek, 28 egyéb, 5 kávé — 38 daily,
+  58 weekly, all 132 monthly) and `config/containers.json` (9 real containers +
+  a "No container" option) are served by `GET /api/config`, loaded through
+  `lib/config.ts`. Output was diffed programmatically against `items.md` and
+  `containers.md`, category by category, and matches on every one.
+- Two schema additions the monthly sheet forced: a third kind, `amount`, for
+  the litre rows (typed in directly — no scale, no pack math), and
+  `defaultContainer`, settable per group or per product, which pre-selects the
+  ice cream tray for all 23 flavours.
 
 ## Step 3 — Calculation engine (no UI yet)
 **Goal:** get the actual math right and provable, independent of any screen.
@@ -69,9 +74,22 @@ actually read, with a schema that has room for everything Phase 0 found
   implementing the confirmed order: `(raw − tare) × multiplier`.
 - A handful of hand-checked examples from Phase 0 (e.g. a peeled orange, a
   plain apple in a small metal tray) written down as test cases.
+- Also covered here, since they're the same kind of arithmetic: box/pack →
+  piece counting for accessories, summing a multi-form product into one
+  total, and naming the "raw weight is below the container's tare" mistake
+  (i.e. the wrong container was picked) instead of returning a negative.
 - **Done when:** the function is correct on every hand-checked example — this
   is the piece that most needs to be right before any UI gets built on top
   of it.
+- **Status:** done. `lib/calc.ts` holds the engine, `lib/calc.test.ts` 23
+  tests (`npm test`, vitest). It works in grams throughout — the one unit the
+  source data agrees on, since every tare is grams while products are read in
+  kg or g — converting only at the edges. Results round to the nearest gram,
+  which also absorbs floating-point dust (`2.675 * 1000` is not exactly 2675).
+  Tests were checked against a deliberately broken engine: reversing the order
+  of operations fails 5 of them, so they have teeth. `lib/config.test.ts`
+  covers the `defaultContainer` resolution added in `containers.md` (ice cream
+  group → ice cream tray).
 
 ## Step 4 — Closing-type & product selection UI
 **Goal:** get to the right product list for the right closing, on a phone
