@@ -42,7 +42,7 @@ describe("weighing a product with a peeled variant", () => {
     const { added, user } = setup("fresh-narancs");
 
     await user.click(screen.getByRole("button", { name: /^Metal$/ }));
-    await user.click(screen.getByRole("button", { name: /Small 276 g/ }));
+    await user.click(screen.getByRole("button", { name: /^S 276 g/ }));
     await user.click(screen.getByRole("button", { name: /Peeled/ }));
     // Hungarian keyboards give a comma, not a period.
     await user.type(screen.getByLabelText(/Raw weight/), "2,34");
@@ -64,7 +64,7 @@ describe("weighing a product with a peeled variant", () => {
   it("refuses a weight lighter than the container itself", async () => {
     const { added, user } = setup("fresh-narancs");
     await user.click(screen.getByRole("button", { name: /^Metal$/ }));
-    await user.click(screen.getByRole("button", { name: /Small 276 g/ }));
+    await user.click(screen.getByRole("button", { name: /^S 276 g/ }));
     await user.type(screen.getByLabelText(/Raw weight/), "0.2");
 
     expect(screen.getByText(/wrong container/)).toBeDefined();

@@ -226,5 +226,6 @@ Phase 1 is broken into steps in `fruitisimo-phase1-plan.md`; Step 1
 (scaffolding), Step 2 (real config), Step 3 (the calculation engine, with
 tests), Step 4 (closing-type switcher and product list), Step 5 (the entry
 flow) and Step 6 (localStorage persistence) are built and verified locally,
-with the first Vercel deploy still to happen, and Step 7 (the review screen at
-`/summary`) done too. Step 8 (xlsx export) is next.
+with the first Vercel deploy still to happen. Steps 7 (review screen) and 8
+(xlsx export) are done too, so the whole closing — enter, review, export —
+works end to end locally. Step 9 (mobile pass) and Step 10 (acceptance) remain.

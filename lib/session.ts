@@ -42,6 +42,14 @@ export function parseSession(
     return null;
   }
 
+  return checkSession(parsed, knownProductIds);
+}
+
+/** The same validation, for a value that has already been parsed. */
+export function checkSession(
+  parsed: unknown,
+  knownProductIds: ReadonlySet<string>,
+): LoadResult | null {
   if (!isStoredSession(parsed)) return null;
 
   // The config can change under a saved closing between deploys; an entry

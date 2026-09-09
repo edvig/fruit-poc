@@ -26,9 +26,29 @@ async function weigh(
   name: string,
   raw: string,
 ) {
+  await openGroupOf(user, name);
   await user.click(screen.getByRole("button", { name: new RegExp(`^${name}`) }));
   await user.type(screen.getByLabelText(/Raw weight/), raw);
   await user.click(screen.getByRole("button", { name: "Add to closing" }));
+}
+
+/** Groups start closed, so nothing inside one is reachable until it is opened. */
+async function openGroup(
+  user: ReturnType<typeof userEvent.setup>,
+  label: string,
+) {
+  const header = screen.getByRole("button", { name: new RegExp(label) });
+  if (header.getAttribute("aria-expanded") === "false") await user.click(header);
+}
+
+async function openGroupOf(
+  user: ReturnType<typeof userEvent.setup>,
+  productName: string,
+) {
+  const product = config.products.find((p) => p.name === productName);
+  const group = config.groups.find((g) => g.id === product?.group);
+  if (!group) throw new Error(`no group for ${productName}`);
+  await openGroup(user, group.label);
 }
 
 describe("surviving a refresh mid-closing", () => {
@@ -42,9 +62,12 @@ describe("surviving a refresh mid-closing", () => {
     // A refresh: the component is thrown away and mounted again from scratch.
     cleanup();
     render(<ClosingScreen config={config} />);
-
-    expect(screen.getByText("2 kg")).toBeDefined();
     expect(screen.getByText("1/38 entered")).toBeDefined();
+
+    // Which groups were open is view state, not part of the closing, so the
+    // list comes back folded and the entry is under its group.
+    await openGroup(user, "Fresh fruit");
+    expect(screen.getByText("2 kg")).toBeDefined();
   });
 
   it("remembers which closing type was selected", async () => {
@@ -152,6 +175,7 @@ describe("switching closing type", () => {
   it("hides weekly-only products from the daily closing", async () => {
     const user = userEvent.setup();
     render(<ClosingScreen config={config} />);
+    await openGroup(user, "Fresh fruit");
     expect(screen.queryByRole("button", { name: /^Cékla/ })).toBeNull();
 
     await user.click(screen.getByRole("tab", { name: "Weekly" }));
@@ -198,6 +222,7 @@ describe("the Missing filter", () => {
     expect(screen.queryByRole("button", { name: /^Alma/ })).toBeNull();
     expect(screen.getByRole("button", { name: /^Narancs/ })).toBeDefined();
 
+
     await user.click(screen.getByRole("button", { name: /^All/ }));
     expect(screen.getByRole("button", { name: /^Alma/ })).toBeDefined();
   });
@@ -238,6 +263,8 @@ describe("the Missing filter", () => {
     const user = userEvent.setup();
     render(<ClosingScreen config={config} />);
     await user.click(screen.getByRole("button", { name: /^Missing/ }));
+    await openGroup(user, "Frozen fruit");
+    await openGroup(user, "Fresh fruit");
 
     expect(screen.getByText("Everything in this group is entered.")).toBeDefined();
     // The unfinished groups still list their products.
@@ -245,23 +272,36 @@ describe("the Missing filter", () => {
   });
 });
 
-describe("collapsing a group", () => {
-  it("folds its products away and back", async () => {
+describe("opening and closing a group", () => {
+  it("starts every group closed, so the screen opens on the categories", () => {
+    render(<ClosingScreen config={config} />);
+
+    for (const label of ["Fresh fruit", "Frozen fruit", "Ice cream"]) {
+      expect(
+        screen
+          .getByRole("button", { name: new RegExp(label) })
+          .getAttribute("aria-expanded"),
+      ).toBe("false");
+    }
+    expect(screen.queryByRole("button", { name: /^Alma/ })).toBeNull();
+  });
+
+  it("unfolds one group at a time, leaving the others closed", async () => {
     const user = userEvent.setup();
     render(<ClosingScreen config={config} />);
     const header = screen.getByRole("button", {
       name: /Fresh fruit & vegetables/,
     });
+
+    await user.click(header);
     expect(header.getAttribute("aria-expanded")).toBe("true");
+    expect(screen.getByRole("button", { name: /^Alma/ })).toBeDefined();
+    // Opening one does not open the rest.
+    expect(screen.queryByRole("button", { name: /^Vanília/ })).toBeNull();
 
     await user.click(header);
     expect(header.getAttribute("aria-expanded")).toBe("false");
     expect(screen.queryByRole("button", { name: /^Alma/ })).toBeNull();
-    // Only that group folds; the others stay open.
-    expect(screen.getByRole("button", { name: /^Vanília/ })).toBeDefined();
-
-    await user.click(header);
-    expect(screen.getByRole("button", { name: /^Alma/ })).toBeDefined();
   });
 });
 
@@ -289,6 +329,8 @@ describe("removing an entry", () => {
     cleanup();
     render(<ClosingScreen config={config} />);
     expect(screen.getByText("1/38 entered")).toBeDefined();
+
+    await openGroup(user, "Fresh fruit");
     expect(screen.getByText("3 kg")).toBeDefined();
   });
 });

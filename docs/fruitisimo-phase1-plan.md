@@ -211,6 +211,31 @@ screen.
 - Client triggers a download after a closing is finished.
 - **Done when:** a downloaded file opens cleanly in Excel/Sheets and the
   numbers match the on-screen summary exactly.
+- **Status:** done. `POST /api/export` takes the closing (entries, tier, date)
+  and returns a single-sheet xlsx; the "Export .xlsx" button on `/summary`
+  downloads it. `write-excel-file` was picked over `exceljs` and SheetJS's
+  `xlsx` — both pull known vulnerabilities (`exceljs` a vulnerable `uuid`,
+  `xlsx@0.18.5` its own advisories), this one audits clean with zero
+  dependencies.
+- **The server recomputes the totals** from the posted entries using its own
+  config, rather than trusting numbers the browser calculated. The file can
+  then never disagree with the rules the app is built on, and it's the same
+  code path the screen uses.
+- Sheet layout: title row (closing type + date), header row, then products
+  grouped under their category heading with the per-form breakdown spelled out
+  where a product has several entries, then a "Not entered (n)" section.
+  Quantities are written as real **numbers** with a per-unit format (kg to 3
+  decimals, counts whole), so the sheet can be summed and checked rather than
+  being a picture of a table.
+- `lib/export.ts` builds the rows as plain data, independent of the writing
+  library, so the contents are testable without unzipping a workbook.
+- Verified by generating a real file through the running server and reading
+  the cells back out of it: `Narancs 7.408 kg` with
+  `Peeled · 2.786 kg + Whole · 4.622 kg` beside it, `Alma 1.107`, `Vanília
+  450 g`, `Not entered (34)`, sheet tab named `Daily 2026-09-08`, and `file(1)`
+  identifying it as a genuine `Microsoft Excel 2007+` workbook. 158 tests pass.
+- Not yet checked on a phone: the blob download path (iOS Safari). That
+  belongs to Step 9's mobile pass.
 
 ## Step 9 — Mobile pass
 **Goal:** a dedicated review pass specifically on a phone, not just

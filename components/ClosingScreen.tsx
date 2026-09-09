@@ -229,7 +229,7 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
 
       <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 pt-3.5 pb-6">
         {groups.map((group) => {
-          const isCollapsed = collapsed[group.id] ?? false;
+          const isCollapsed = collapsed[group.id] ?? true;
           return (
             <section key={group.id} className="flex flex-col gap-2">
               <button

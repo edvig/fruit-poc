@@ -71,4 +71,6 @@ count a product and commit it, with multi-form products summed into one line.
 The in-progress closing is kept in localStorage, so a refresh or a phone
 locking mid-closing loses nothing. A second screen at `/summary` reviews the
 closing — totals per product, multi-form items broken down, and what is still
-outstanding. The xlsx export comes next.
+outstanding. "Export .xlsx" there posts the closing to
+`POST /api/export`, which recomputes the totals server-side and returns a
+single-sheet workbook.

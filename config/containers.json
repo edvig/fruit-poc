@@ -9,31 +9,31 @@
     },
     {
       "id": "metal-mini",
-      "name": "Mini",
+      "name": "XS",
       "group": "Metal",
       "tare": 19
     },
     {
       "id": "metal-small",
-      "name": "Small",
+      "name": "S",
       "group": "Metal",
       "tare": 276
     },
     {
       "id": "metal-medium",
-      "name": "Medium",
+      "name": "M",
       "group": "Metal",
       "tare": 378
     },
     {
       "id": "metal-large",
-      "name": "Large",
+      "name": "L",
       "group": "Metal",
       "tare": 492
     },
     {
       "id": "metal-xlarge",
-      "name": "Extra large",
+      "name": "XL",
       "group": "Metal",
       "tare": 620
     },

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useSyncExternalStore } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 
 import type { AppConfig } from "@/lib/config";
 import type { Entry } from "@/lib/entries";
@@ -59,6 +59,35 @@ export default function SummaryScreen({ config }: { config: AppConfig }) {
     () => buildSummary(config, tier, entries),
     [config, tier, entries],
   );
+
+  const [exportState, setExportState] = useState<"idle" | "working" | "failed">(
+    "idle",
+  );
+
+  async function exportXlsx() {
+    setExportState("working");
+    try {
+      const response = await fetch("/api/export", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ version: 1, tier, startedAt, entries }),
+      });
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+
+      const blob = await response.blob();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement("a");
+      link.href = url;
+      link.download = `fruitisimo-${tier}-${startedAt}.xlsx`;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      URL.revokeObjectURL(url);
+      setExportState("idle");
+    } catch {
+      setExportState("failed");
+    }
+  }
 
   return (
     <div className="mx-auto flex h-dvh max-w-md flex-col overflow-hidden bg-white text-slate-900">
@@ -145,6 +174,27 @@ export default function SummaryScreen({ config }: { config: AppConfig }) {
           </section>
         )}
       </div>
+
+      <footer className="flex flex-none flex-col gap-1.5 border-t border-slate-200 px-4 pt-3 pb-4">
+        <button
+          type="button"
+          onClick={exportXlsx}
+          disabled={summary.enteredCount === 0 || exportState === "working"}
+          className="h-12 rounded-xl bg-emerald-700 text-[15px] font-semibold text-white disabled:bg-slate-200 disabled:text-slate-400"
+        >
+          {exportState === "working" ? "Preparing…" : "Export .xlsx"}
+        </button>
+        {exportState === "failed" ? (
+          <p className="text-center text-xs text-red-700">
+            The file could not be prepared. Check the connection and try again —
+            nothing was lost.
+          </p>
+        ) : (
+          <p className="text-center text-xs text-slate-400">
+            Missing items still export — this is a snapshot, not a gate.
+          </p>
+        )}
+      </footer>
     </div>
   );
 }
