@@ -1,25 +1,130 @@
-import writeXlsxFile, { type Cell, type Row } from "write-excel-file/node";
+import writeXlsxFile, {
+  type Cell,
+  type CellObject,
+  type Row,
+} from "write-excel-file/node";
 
 import { getConfig } from "@/lib/config";
-import { buildExportRows, exportFilename, type ExportCell } from "@/lib/export";
+import {
+  buildExportRows,
+  exportFilename,
+  type CellStyle,
+  type ExportCell,
+  type ExportRow,
+} from "@/lib/export";
 import { checkSession } from "@/lib/session";
 
-/** Our library-agnostic cell description, in the shape the writer wants. */
-function toCell(cell: ExportCell): Cell {
-  if (cell.value === null) return null;
-  if (typeof cell.value === "number") {
-    return {
-      value: cell.value,
-      type: Number,
-      format: cell.format,
-      fontWeight: cell.bold ? "bold" : undefined,
-    };
+const INK = "#1E293B";
+const MUTED = "#64748B";
+const FAINT = "#94A3B8";
+const RULE = "#94A3B8";
+const TITLE_FILL = "#CBD5E1";
+const SUMMARY_FILL = "#E2E8F0";
+const HEADER_FILL = "#E2E8F0";
+const BAND_FILL = "#F1F5F9";
+
+/** Style-only cell descriptions: `CellObject` with the value left off. */
+type Style = Omit<CellObject, "value" | "type" | "format">;
+
+/** Every cell of the sheet is boxed in, like the original. */
+const BOXED: Style = {
+  borderStyle: "thin",
+  borderColor: RULE,
+  alignVertical: "center",
+};
+
+/**
+ * How each kind of cell looks. Fruitisimo's own sheet is a bordered table with
+ * a bold heading, bold column titles and a band per category — this follows
+ * that, only in one list instead of two.
+ */
+const STYLES: Record<CellStyle, Style> = {
+  // The top three rows are the summary block: what closing this is, when, and
+  // how much of it was done. They are filled and boxed so they read as one
+  // header rather than three loose lines on white.
+  title: {
+    ...BOXED,
+    fontSize: 14,
+    fontWeight: "bold",
+    textColor: INK,
+    backgroundColor: TITLE_FILL,
+    height: 26,
+  },
+  metaLabel: {
+    ...BOXED,
+    fontWeight: "bold",
+    fontSize: 12,
+    textColor: INK,
+    backgroundColor: SUMMARY_FILL,
+    height: 19,
+  },
+  meta: {
+    ...BOXED,
+    fontSize: 12,
+    textColor: INK,
+    backgroundColor: SUMMARY_FILL,
+    height: 19,
+  },
+  header: {
+    ...BOXED,
+    fontWeight: "bold",
+    textColor: INK,
+    backgroundColor: HEADER_FILL,
+    borderStyle: "medium",
+    align: "center",
+    height: 20,
+  },
+  band: {
+    ...BOXED,
+    fontWeight: "bold",
+    textColor: INK,
+    backgroundColor: BAND_FILL,
+    topBorderStyle: "medium",
+    bottomBorderStyle: "medium",
+    height: 18,
+  },
+  name: BOXED,
+  number: { ...BOXED, align: "right" },
+  unit: { ...BOXED, align: "center", textColor: MUTED },
+  note: { ...BOXED, textColor: MUTED, wrap: true },
+  missing: { ...BOXED, textColor: FAINT },
+};
+
+/**
+ * A merged cell swallows the ones after it, and the writer insists those be
+ * `null`. The rows are built with every cell styled — so a band survives even
+ * where a merge is ignored — and the blanking happens here, at the edge.
+ */
+function toRow(row: ExportRow): Row {
+  const cells: Row = [];
+  let swallowed = 0;
+  for (const cell of row) {
+    if (swallowed > 0) {
+      cells.push(null);
+      swallowed -= 1;
+      continue;
+    }
+    swallowed = (cell.columnSpan ?? 1) - 1;
+    cells.push(toCell(cell));
   }
-  return {
-    value: cell.value,
-    type: String,
-    fontWeight: cell.bold ? "bold" : undefined,
+  return cells;
+}
+
+/** Our library-agnostic cell description, in the shape the writer wants. */
+function toCell(cell: ExportCell | null): Cell {
+  if (!cell) return null;
+  const style = {
+    ...(cell.style ? STYLES[cell.style] : {}),
+    ...(cell.columnSpan ? { columnSpan: cell.columnSpan } : {}),
   };
+
+  // An empty cell still gets its borders and fill, so bands and blanks in the
+  // table do not leave holes in the grid.
+  if (cell.value === null || cell.value === undefined) return style;
+  if (typeof cell.value === "number") {
+    return { ...style, value: cell.value, type: Number, format: cell.format };
+  }
+  return { ...style, value: cell.value, type: String };
 }
 
 /**
@@ -52,13 +157,15 @@ export async function POST(request: Request) {
   }
 
   const { tier, startedAt, entries } = checked.session;
-  const rows: Row[] = buildExportRows(config, tier, startedAt, entries).map(
-    (row) => row.map(toCell),
-  );
+  const rows: Row[] = buildExportRows(config, tier, startedAt, entries).map(toRow);
 
   const file = await writeXlsxFile(rows, {
     sheet: `${TIER_SHEET_NAMES[tier]} ${startedAt}`,
-    columns: [{ width: 32 }, { width: 12 }, { width: 8 }, { width: 48 }],
+    columns: [{ width: 34 }, { width: 12 }, { width: 8 }, { width: 46 }],
+    // The title block and the column titles stay put while scrolling a
+    // 132-product monthly closing.
+    stickyRowsCount: 5,
+    showGridLines: false,
   });
   const buffer = await file.toBuffer();
 
