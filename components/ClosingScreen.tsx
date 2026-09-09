@@ -156,7 +156,7 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
               role="tab"
               aria-selected={tier === t.id}
               onClick={() => setTier(t.id)}
-              className={`flex-1 rounded-lg py-2 text-[13.5px] font-medium transition ${
+              className={`min-h-11 flex-1 rounded-lg py-2 text-[13.5px] font-medium transition ${
                 tier === t.id
                   ? "bg-white text-slate-900 shadow-sm"
                   : "text-slate-500"
@@ -191,7 +191,7 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
               type="button"
               onClick={() => setFilter(id)}
               aria-pressed={filter === id}
-              className={`rounded-full border px-3 py-1.5 text-xs font-medium ${
+              className={`min-h-11 rounded-full border px-3.5 py-1.5 text-xs font-medium ${
                 filter === id
                   ? "border-slate-900 bg-slate-900 text-white"
                   : "border-slate-200 bg-white text-slate-500"
@@ -227,7 +227,7 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
         </p>
       )}
 
-      <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 pt-3.5 pb-6">
+      <div className="flex flex-1 flex-col gap-5 overflow-y-auto px-4 pt-3.5 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
         {groups.map((group) => {
           const isCollapsed = collapsed[group.id] ?? true;
           return (
@@ -238,7 +238,7 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
                   setCollapsed((c) => ({ ...c, [group.id]: !isCollapsed }))
                 }
                 aria-expanded={!isCollapsed}
-                className="flex items-center justify-between gap-2.5 rounded-[11px] bg-slate-100 px-3.5 py-3 text-left"
+                className="flex min-h-11 items-center justify-between gap-2.5 rounded-[11px] bg-slate-100 px-3.5 py-3 text-left"
               >
                 <span className="flex min-w-0 items-center gap-2.5">
                   <span className="flex-none text-[17px] leading-none">
@@ -288,12 +288,12 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
 
         <Link
           href="/summary"
-          className="flex h-12 items-center justify-center rounded-xl bg-slate-900 text-[15px] font-semibold text-white no-underline"
+          className="flex h-12 flex-none items-center justify-center rounded-xl bg-slate-900 text-[15px] font-semibold text-white no-underline"
         >
           Review &amp; export
         </Link>
 
-        <div className="pt-2">
+        <div className="flex-none pt-2">
           {confirmingReset ? (
             <div className="flex items-center justify-between gap-3 rounded-xl border border-red-200 bg-red-50 px-3.5 py-3">
               <span className="text-[13px] text-red-900">
@@ -322,7 +322,7 @@ export default function ClosingScreen({ config }: { config: AppConfig }) {
               type="button"
               onClick={() => setConfirmingReset(true)}
               disabled={entries.length === 0}
-              className="w-full rounded-xl border border-slate-200 py-3 text-[13px] font-medium text-slate-500 disabled:opacity-50"
+              className="min-h-11 w-full rounded-xl border border-slate-200 py-3 text-[13px] font-medium text-slate-500 disabled:opacity-50"
             >
               Start new closing
             </button>

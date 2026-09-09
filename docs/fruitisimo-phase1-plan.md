@@ -246,6 +246,35 @@ screen.
   nothing important is off-screen or requires zooming.
 - **Done when:** a full closing can be done on a phone one-handed, without
   mis-taps, from a stand-still.
+- **Status:** the automated half is done; final sign-off still needs a real
+  phone (see below). Audited by driving the actual Chrome on the dev machine
+  over the DevTools Protocol at an iPhone 14 viewport (390×844, DPR 3, touch
+  emulation) — no extra dependency, just Node's built-in WebSocket.
+- **Found and fixed — every tap target now clears the 44px iOS minimum:**
+  - Daily/Weekly/Monthly tabs were 36px tall.
+  - All/Missing filter chips were 30px.
+  - Container, size and variant chips were 38px.
+  - **Entry remove buttons were 24×24** — the smallest target in the app and
+    the only destructive one. The light 24px circle is kept, but the button
+    around it is now a full 44×44 hit area.
+  - "Back to entry" on the summary was a 20px-tall bare text link.
+  - **"Review & export" collapsed to 23px** once the list got long (reported
+    from the phone, and reproduced in the audit). It is a flex child in a
+    column container, so it was being squashed: `h-12` sets a height but
+    doesn't stop shrinking — it needed `flex-none`. Now a solid 48px with all
+    38 rows expanded. The reset button had the same latent bug.
+- Also addressed: `env(safe-area-inset-bottom)` padding so the export button
+  and the end of the list clear the iPhone home indicator, and expanding a row
+  now scrolls it into view (`block: "nearest"`) so the form doesn't open below
+  the fold where the keyboard covers it.
+- Verified clean: no horizontal overflow on either screen at 390px, the
+  viewport meta allows zooming to 5×, and every input computes to ≥16px so iOS
+  doesn't zoom the page on focus.
+- **Still needs a real phone, and cannot be checked from here:**
+  - Whether the xlsx blob download works in iOS Safari (flagged in Step 8).
+  - Real keyboard behaviour: does the decimal keypad appear, and does the
+    layout survive it opening over a expanded row.
+  - One-handed reach and mis-taps with wet or cold hands at the actual scale.
 
 ## Step 10 — End-to-end acceptance
 **Goal:** confirm Phase 1's exit criteria for real, not just "it should work."

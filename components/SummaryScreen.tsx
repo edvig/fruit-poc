@@ -94,7 +94,7 @@ export default function SummaryScreen({ config }: { config: AppConfig }) {
       <header className="flex flex-none flex-col gap-2.5 border-b border-slate-200 px-4 pt-3.5 pb-3">
         <Link
           href="/"
-          className="text-[13px] font-medium text-emerald-700 no-underline"
+          className="-ml-1 inline-flex min-h-11 items-center px-1 text-[13px] font-medium text-emerald-700 no-underline"
         >
           ← Back to entry
         </Link>
@@ -175,12 +175,12 @@ export default function SummaryScreen({ config }: { config: AppConfig }) {
         )}
       </div>
 
-      <footer className="flex flex-none flex-col gap-1.5 border-t border-slate-200 px-4 pt-3 pb-4">
+      <footer className="flex flex-none flex-col gap-1.5 border-t border-slate-200 px-4 pt-3 pb-[max(1rem,env(safe-area-inset-bottom))]">
         <button
           type="button"
           onClick={exportXlsx}
           disabled={summary.enteredCount === 0 || exportState === "working"}
-          className="h-12 rounded-xl bg-emerald-700 text-[15px] font-semibold text-white disabled:bg-slate-200 disabled:text-slate-400"
+          className="h-12 flex-none rounded-xl bg-emerald-700 text-[15px] font-semibold text-white disabled:bg-slate-200 disabled:text-slate-400"
         >
           {exportState === "working" ? "Preparing…" : "Export .xlsx"}
         </button>

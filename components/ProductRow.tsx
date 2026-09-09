@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import {
   checkCountEntry,
@@ -50,9 +50,19 @@ export default function ProductRow({
   const mine = entriesFor(product.id, entries);
   const total = productTotal(product, entries);
   const entered = mine.length > 0;
+  const row = useRef<HTMLLIElement>(null);
+
+  // Tapping a row near the bottom of the screen opens the form below the fold,
+  // where the phone keyboard then covers it. "nearest" only scrolls when the
+  // form genuinely doesn't fit, so it never fights a deliberate scroll.
+  useEffect(() => {
+    if (!expanded) return;
+    row.current?.scrollIntoView?.({ block: "nearest", behavior: "smooth" });
+  }, [expanded]);
 
   return (
     <li
+      ref={row}
       // data-state is the semantic hook: the tint is only its presentation,
       // and a third state ("Done") is parked in Phase 3 of the app plan.
       data-state={entered ? "entered" : "empty"}
@@ -86,16 +96,18 @@ export default function ProductRow({
           {mine.map((entry) => (
             <li
               key={entry.id}
-              className="flex items-center gap-2 rounded-lg border border-slate-200 bg-slate-50 py-1 pr-1 pl-2.5 text-xs text-slate-700"
+              className="flex min-h-11 items-center gap-1 rounded-lg border border-slate-200 bg-slate-50 pr-0.5 pl-3 text-xs text-slate-700"
             >
               {entryLabel(entry, product, config)}
               <button
                 type="button"
                 onClick={() => onRemove(entry.id)}
                 aria-label={`Remove ${entryLabel(entry, product, config)}`}
-                className="flex h-6 w-6 flex-none items-center justify-center rounded-full bg-slate-200 text-slate-600"
+                className="flex h-11 w-11 flex-none items-center justify-center text-slate-600"
               >
-                ×
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-slate-200">
+                  ×
+                </span>
               </button>
             </li>
           ))}
@@ -393,7 +405,7 @@ function Chip({
       type="button"
       onClick={onClick}
       aria-pressed={active}
-      className={`flex-none rounded-full border px-3 py-2 text-[13px] whitespace-nowrap ${
+      className={`min-h-11 flex-none rounded-full border px-3.5 py-2 text-[13px] whitespace-nowrap ${
         active
           ? "border-slate-900 bg-slate-900 text-white"
           : "border-slate-200 bg-white text-slate-600"
