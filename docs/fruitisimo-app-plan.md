@@ -228,6 +228,5 @@ tests), Step 4 (closing-type switcher and product list), Step 5 (the entry
 flow) and Step 6 (localStorage persistence) are built and verified locally,
 with the first Vercel deploy still to happen. Steps 7 (review screen) and 8
 (xlsx export) are done too, so the whole closing — enter, review, export —
-works end to end locally. Step 9's automated mobile audit is done; what
-remains is what genuinely needs the app deployed and a phone in hand — the rest
-of Step 9 and all of Step 10.
+works end to end, and Step 9's mobile pass is confirmed on a real iPhone. Only
+Step 10 (the end-to-end acceptance run with real quantities) remains.

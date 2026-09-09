@@ -234,8 +234,9 @@ screen.
   `Peeled · 2.786 kg + Whole · 4.622 kg` beside it, `Alma 1.107`, `Vanília
   450 g`, `Not entered (34)`, sheet tab named `Daily 2026-09-08`, and `file(1)`
   identifying it as a genuine `Microsoft Excel 2007+` workbook. 158 tests pass.
-- Not yet checked on a phone: the blob download path (iOS Safari). That
-  belongs to Step 9's mobile pass.
+- **Confirmed on a real iPhone (2026-09-09):** the blob download path works in
+  iOS Safari — the file downloads and opens. This was the one part of the
+  export that couldn't be proven from the dev machine.
 
 ## Step 9 — Mobile pass
 **Goal:** a dedicated review pass specifically on a phone, not just
@@ -246,8 +247,9 @@ screen.
   nothing important is off-screen or requires zooming.
 - **Done when:** a full closing can be done on a phone one-handed, without
   mis-taps, from a stand-still.
-- **Status:** the automated half is done; final sign-off still needs a real
-  phone (see below). Audited by driving the actual Chrome on the dev machine
+- **Status:** done, confirmed on a real iPhone (2026-09-09) — the decimal
+  keypad, the layout with the keyboard open, one-handed reach and the xlsx
+  download all check out. Audited first by driving the actual Chrome on the dev machine
   over the DevTools Protocol at an iPhone 14 viewport (390×844, DPR 3, touch
   emulation) — no extra dependency, just Node's built-in WebSocket.
 - **Found and fixed — every tap target now clears the 44px iOS minimum:**
@@ -270,11 +272,9 @@ screen.
 - Verified clean: no horizontal overflow on either screen at 390px, the
   viewport meta allows zooming to 5×, and every input computes to ≥16px so iOS
   doesn't zoom the page on focus.
-- **Still needs a real phone, and cannot be checked from here:**
-  - Whether the xlsx blob download works in iOS Safari (flagged in Step 8).
-  - Real keyboard behaviour: does the decimal keypad appear, and does the
-    layout survive it opening over a expanded row.
-  - One-handed reach and mis-taps with wet or cold hands at the actual scale.
+- **Confirmed on a real iPhone (2026-09-09):** the xlsx download works in iOS
+  Safari, the decimal keypad comes up for weights, the layout holds with the
+  keyboard open, and the screen is usable one-handed. Nothing outstanding.
 
 ## Step 10 — End-to-end acceptance
 **Goal:** confirm Phase 1's exit criteria for real, not just "it should work."
@@ -283,6 +283,15 @@ screen.
 - Compare the resulting xlsx against what would've come out of the
   calculator + mental math process.
 - **Done when:** you'd trust the app's numbers over the calculator's.
+- **Status:** ready to run — see `fruitisimo-acceptance.md` for the script,
+  the ten cases worth deliberately covering, and a sign-off table.
+- The dry run is automated: `components/acceptance.test.tsx` enters a realistic
+  daily closing **through the real UI** (no injected state), then checks the
+  exported figures against arithmetic worked out by hand — oranges weighed
+  twice totalling 7.408 kg with the breakdown, apples 1.107 kg, peeled
+  watermelon 3.36 kg, ice cream 450 g, cups 1754 db, plus removing a wrong
+  entry mid-closing. What it cannot test is whether the rules match how
+  Fruitisimo actually closes; that's what the live run is for.
 
 ---
 **Working order:** steps are listed in the order we'll build them — each one
